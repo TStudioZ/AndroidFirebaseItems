@@ -1,0 +1,2 @@
+include ':app', ':EssentialUILib'
+project(':EssentialUILib').projectDir = new File('EssentialUILibrary/EssentialUILibrary')

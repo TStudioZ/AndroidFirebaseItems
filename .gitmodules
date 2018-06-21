@@ -1,0 +1,3 @@
+[submodule "Implementation/AndroidFirebaseItems/EssentialUILibrary"]
+	path = Implementation/AndroidFirebaseItems/EssentialUILibrary
+	url = git@github.com:TStudioZ/EssentialUILibrary.git
