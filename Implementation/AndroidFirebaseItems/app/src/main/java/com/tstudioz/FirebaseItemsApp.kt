@@ -2,6 +2,7 @@ package com.tstudioz
 
 import android.os.StrictMode
 import com.tstudioz.androidfirebaseitems.BuildConfig
+import com.tstudioz.androidfirebaseitems.dagger.DaggerAppComponent
 import com.tstudioz.essentialuilibrary.dagger.AppInjector
 import dagger.android.AndroidInjector
 import dagger.android.DaggerApplication
