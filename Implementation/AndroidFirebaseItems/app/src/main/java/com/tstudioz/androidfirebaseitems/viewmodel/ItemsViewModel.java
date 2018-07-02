@@ -14,12 +14,25 @@ import javax.inject.Inject;
 
 public class ItemsViewModel extends ViewModel {
 
-    private MutableLiveData<List<DataItem>> items;
     private IFirebaseDatabaseRepository<DataItem> repo;
+
+    private MutableLiveData<List<DataItem>> items;
+    private IFirebaseDatabaseRepository.FirebaseDatabaseRepositoryCallback<DataItem> callback;
 
     @Inject
     public ItemsViewModel(final IFirebaseDatabaseRepository<DataItem> repo) {
         this.repo = repo;
+        this.callback = new IFirebaseDatabaseRepository.FirebaseDatabaseRepositoryCallback<DataItem>() {
+            @Override
+            public void onSuccess(List<DataItem> result) {
+                items.setValue(result);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                items.setValue(null);
+            }
+        };
     }
 
     @MainThread
@@ -32,22 +45,12 @@ public class ItemsViewModel extends ViewModel {
     }
 
     private void loadItems() {
-        repo.addListener(new IFirebaseDatabaseRepository.FirebaseDatabaseRepositoryCallback<DataItem>() {
-            @Override
-            public void onSuccess(List<DataItem> result) {
-                items.setValue(result);
-            }
-
-            @Override
-            public void onError(Exception e) {
-                items.setValue(null);
-            }
-        });
+        repo.addListener(callback);
     }
 
     @Override
     protected void onCleared() {
         super.onCleared();
-        repo.removeListener();
+        repo.removeListener(callback);
     }
 }

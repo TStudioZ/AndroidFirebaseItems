@@ -87,7 +87,7 @@ class ItemsFragment : Fragment(), Injectable {
     }
 
     private fun setupAdapter(): RecyclerViewItemsAdapter<DataItem, DataItemViewHolder> {
-        return RecyclerViewItemsAdapter<DataItem, DataItemViewHolder>(object : RecyclerViewItemsAdapter.OnItemRecyclerViewListener<DataItem> {
+        return RecyclerViewItemsAdapter(object : RecyclerViewItemsAdapter.OnItemRecyclerViewListener<DataItem> {
             override fun onItemSelected(item: DataItem) {
 
             }
