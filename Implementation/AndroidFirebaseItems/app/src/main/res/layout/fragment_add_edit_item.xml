@@ -7,7 +7,10 @@
     <com.julianraj.validatedtextinputlayout.ValidatedTextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/component_medium_horizontal_margin"
+        android:layout_marginStart="@dimen/component_medium_horizontal_margin"
+        android:layout_marginEnd="@dimen/component_medium_horizontal_margin"
+        android:paddingTop="@dimen/component_medium_vertical_margin"
+        android:layout_marginBottom="@dimen/component_medium_vertical_margin"
         validation:autoTrim="true"
         validation:isRequired="true"
         validation:requiredValidationMessage="@string/error_name_required"
