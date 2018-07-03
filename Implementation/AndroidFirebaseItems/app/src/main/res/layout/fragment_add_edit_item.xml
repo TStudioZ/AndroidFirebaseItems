@@ -5,6 +5,7 @@
     xmlns:validation="http://schemas.android.com/apk/res-auto">
     
     <com.julianraj.validatedtextinputlayout.ValidatedTextInputLayout
+        android:id="@+id/inputItemName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/component_medium_horizontal_margin"
@@ -21,7 +22,6 @@
         validation:regexValidationMessage="@string/error_name_format">
 
         <android.support.design.widget.TextInputEditText
-            android:id="@+id/etItemName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/hint_item_name"
