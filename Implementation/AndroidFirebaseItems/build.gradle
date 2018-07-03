@@ -28,5 +28,12 @@ task clean(type: Delete) {
 }
 
 ext {
+    supportLibraryVersion = '27.1.1'
+    archComponentsVersion = '1.1.1'
+    constraintLayoutVersion = '1.1.2'
     daggerVersion = '2.15'
+    jUnitVersion = '4.12'
+    testRunnerVersion = '1.0.2'
+    espressoVersion = '3.0.2'
+    firebaseVersion = '16.0.1'
 }
