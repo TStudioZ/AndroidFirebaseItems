@@ -7,6 +7,8 @@ import android.support.annotation.MainThread;
 
 import com.tstudioz.androidfirebaseitems.data.DataItem;
 import com.tstudioz.androidfirebaseitems.data.IFirebaseDatabaseRepository;
+import com.tstudioz.essentialuilibrary.viewmodel.SingleLiveEvent;
+import com.tstudioz.essentialuilibrary.viewmodel.SnackbarMessage;
 
 import java.util.List;
 
@@ -18,6 +20,12 @@ public class ItemsViewModel extends ViewModel {
 
     private MutableLiveData<List<DataItem>> items;
     private IFirebaseDatabaseRepository.FirebaseDatabaseRepositoryCallback<DataItem> callback;
+
+    private SnackbarMessage itemAddedMessage = new SnackbarMessage();
+
+    public SnackbarMessage getItemAddedMessage() {
+        return itemAddedMessage;
+    }
 
     @Inject
     public ItemsViewModel(final IFirebaseDatabaseRepository<DataItem> repo) {
@@ -46,6 +54,14 @@ public class ItemsViewModel extends ViewModel {
 
     private void loadItems() {
         repo.addListener(callback);
+    }
+
+    public void saveItem(DataItem item) {
+        repo.save(item);
+    }
+
+    public SingleLiveEvent<DataItem> getSaveItemEvent() {
+        return repo.getSaveModelEvent();
     }
 
     @Override

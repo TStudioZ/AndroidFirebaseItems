@@ -3,7 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.AddEditItemActivity">
+    android:layout_marginStart="@dimen/component_medium_horizontal_margin"
+    android:layout_marginEnd="@dimen/component_medium_horizontal_margin"
+    tools:context=".ui.AddEditItemActivity"
+    tools:menu="menu_main">
 
     <fragment android:id="@+id/fragmentAddEditItem"
         android:name="com.tstudioz.androidfirebaseitems.ui.AddEditItemFragment"

@@ -7,6 +7,11 @@
     <string name="error_name_required">Name is required.</string>
     <string name="error_name_length">Wrong length.</string>
     <string name="error_name_format">Wrong format.</string>
+    <string name="error_count_required">Count is required.</string>
+    <string name="error_count_length">Maximum count can be 999.</string>
+    <string name="error_count_zero">Count must be positive.</string>
     <string name="action_add_item">Add item</string>
     <string name="action_done">Done</string>
+    <string name="hint_item_count">Count</string>
+    <string name="item_added">Item added</string>
 </resources>

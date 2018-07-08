@@ -1,5 +1,6 @@
 package com.tstudioz.androidfirebaseitems.dagger;
 
+import com.tstudioz.androidfirebaseitems.ui.AddEditItemFragment;
 import com.tstudioz.androidfirebaseitems.ui.ItemsFragment;
 
 import dagger.Module;
@@ -10,4 +11,7 @@ abstract class FragmentBuildersModule {
 
     @ContributesAndroidInjector
     abstract ItemsFragment contributeItemsFragment();
+
+    @ContributesAndroidInjector
+    abstract AddEditItemFragment contributeAddEditItemFragment();
 }

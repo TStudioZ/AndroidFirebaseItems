@@ -1,7 +1,6 @@
 package com.tstudioz.androidfirebaseitems.ui
 
 import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.net.Uri
@@ -15,10 +14,10 @@ import android.widget.TextView
 import com.tstudioz.androidfirebaseitems.R
 import com.tstudioz.androidfirebaseitems.data.DataItem
 import com.tstudioz.androidfirebaseitems.viewmodel.ItemsViewModel
-import com.tstudioz.essentialuilibrary.dagger.Injectable
+import com.tstudioz.essentialuilibrary.ui.BaseFragment
 import com.tstudioz.essentialuilibrary.ui.RecyclerViewItemsAdapter
 import com.tstudioz.essentialuilibrary.util.FragmentUtils
-import javax.inject.Inject
+import com.tstudioz.essentialuilibrary.util.SnackbarUtils
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -34,7 +33,7 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  *
  */
-class ItemsFragment : Fragment(), Injectable {
+class ItemsFragment : BaseFragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -45,10 +44,6 @@ class ItemsFragment : Fragment(), Injectable {
     private lateinit var adapter: RecyclerViewItemsAdapter<DataItem, DataItemViewHolder>;
 
     private lateinit var viewModel: ItemsViewModel;
-
-    @Inject
-    @JvmField
-    var viewModelFactory: ViewModelProvider.Factory? = null;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,7 +78,12 @@ class ItemsFragment : Fragment(), Injectable {
             if (it != null) {
                 adapter.setItems(it);
             }
-        });
+        })
+        viewModel.saveItemEvent.observe(this, Observer {
+            if (it != null) {
+                SnackbarUtils.showSnackbar(view, getString(R.string.item_added))
+            }
+        })
     }
 
     private fun setupAdapter(): RecyclerViewItemsAdapter<DataItem, DataItemViewHolder> {

@@ -1,4 +1,4 @@
 package com.tstudioz.androidfirebaseitems.data
 
-data class DataItem(val name: String) {
+data class DataItem(val name: String, val count: Int) {
 }

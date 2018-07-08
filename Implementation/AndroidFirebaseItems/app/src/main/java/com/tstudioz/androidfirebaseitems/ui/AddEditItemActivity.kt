@@ -1,10 +1,10 @@
 package com.tstudioz.androidfirebaseitems.ui
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import com.tstudioz.androidfirebaseitems.R
+import com.tstudioz.essentialuilibrary.ui.BaseActivity
 
-class AddEditItemActivity : AppCompatActivity() {
+class AddEditItemActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
