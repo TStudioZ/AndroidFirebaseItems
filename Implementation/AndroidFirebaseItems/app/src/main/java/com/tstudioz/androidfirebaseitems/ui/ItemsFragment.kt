@@ -28,10 +28,6 @@ import com.tstudioz.essentialuilibrary.util.FragmentUtils
 import com.tstudioz.essentialuilibrary.util.SnackbarUtils
 import java.util.*
 
-
-
-
-
 private const val RC_SIGN_IN = 123
 
 class ItemsFragment : BaseFragment() {
@@ -127,11 +123,13 @@ class ItemsFragment : BaseFragment() {
     }
 
     private fun observeData() {
+        viewModelItems.items.removeObservers(this)
         viewModelItems.items.observe(this, Observer {
             if (it != null) {
                 adapter.setItems(it)
             }
         })
+        viewModelItems.saveItemEvent.removeObservers(this)
         viewModelItems.saveItemEvent.observe(this, Observer {
             when (it?.getContentIfNotHandled(TAG)?.status?.status) {
                 Status.SUCCESS -> {
@@ -139,6 +137,7 @@ class ItemsFragment : BaseFragment() {
                 }
             }
         })
+        viewModelItems.deleteItemEvent.removeObservers(this)
         viewModelItems.deleteItemEvent.observe(this, Observer {
             when (it?.getContentIfNotHandled(TAG)?.status?.status) {
                 Status.SUCCESS -> {

@@ -45,7 +45,7 @@ public class FirebaseDatabaseUserRepository implements IFirebaseDatabaseUserRepo
     @Override
     public void registerLoadUser(String uid, FirebaseUserCallback callback) {
         DatabaseReference ref = dbReference.child(getUsersNode()).child(uid);
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+        ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
