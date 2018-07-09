@@ -57,14 +57,14 @@ class ItemsFragment : BaseFragment() {
             }
         })
         viewModel.saveItemEvent.observe(this, Observer {
-            when (it?.contentIfNotHandled?.status?.status) {
+            when (it?.getContentIfNotHandled(TAG)?.status?.status) {
                 Status.SUCCESS -> {
                     SnackbarUtils.showSnackbar(view, getString(R.string.item_added))
                 }
             }
         })
         viewModel.deleteItemEvent.observe(this, Observer {
-            when (it?.contentIfNotHandled?.status?.status) {
+            when (it?.getContentIfNotHandled(TAG)?.status?.status) {
                 Status.SUCCESS -> {
                     SnackbarUtils.showSnackbar(view, getString(R.string.item_removed))
                 }
@@ -141,5 +141,9 @@ class ItemsFragment : BaseFragment() {
     interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         fun onFragmentInteraction(uri: Uri)
+    }
+
+    companion object {
+        const val TAG = "ItemsFragment"
     }
 }

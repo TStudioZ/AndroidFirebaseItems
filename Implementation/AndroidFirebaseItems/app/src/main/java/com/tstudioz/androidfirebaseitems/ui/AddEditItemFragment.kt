@@ -78,7 +78,7 @@ class AddEditItemFragment : BaseFragment() {
             SnackbarUtils.showSnackbar(view, getString(it!!))
         })
         viewModelItems.saveItemEvent.observe(this, Observer {
-            when (it?.peekContentIfNotHandled()?.status?.status) {
+            when (it?.getContentIfNotHandled(TAG)?.status?.status) {
                 Status.SUCCESS -> {
                     activity?.finish()
                 }
@@ -88,7 +88,7 @@ class AddEditItemFragment : BaseFragment() {
             }
         })
         viewModelItems.deleteItemEvent.observe(this, Observer {
-            when (it?.peekContentIfNotHandled()?.status?.status) {
+            when (it?.getContentIfNotHandled(TAG)?.status?.status) {
                 Status.SUCCESS -> {
                     activity?.finish()
                 }
@@ -157,6 +157,9 @@ class AddEditItemFragment : BaseFragment() {
     }
 
     companion object {
+
+        const val TAG = "AddEditItemFragment"
+
         @JvmStatic
         fun newInstance(itemKey: String? = null) =
                 AddEditItemFragment().apply {

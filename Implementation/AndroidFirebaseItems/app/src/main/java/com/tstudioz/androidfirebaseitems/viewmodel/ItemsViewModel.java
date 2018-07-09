@@ -1,6 +1,7 @@
 package com.tstudioz.androidfirebaseitems.viewmodel;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.support.annotation.MainThread;
@@ -10,6 +11,7 @@ import com.tstudioz.androidfirebaseitems.data.DataItem;
 import com.tstudioz.androidfirebaseitems.data.IFirebaseDatabaseRepository;
 import com.tstudioz.androidfirebaseitems.data.Resource;
 import com.tstudioz.essentialuilibrary.viewmodel.LiveDataEvent;
+import com.tstudioz.essentialuilibrary.viewmodel.LiveDataEventWithTaggedObservers;
 import com.tstudioz.essentialuilibrary.viewmodel.SnackbarMessage;
 
 import java.util.List;
@@ -22,6 +24,8 @@ public class ItemsViewModel extends ViewModel {
 
     private MutableLiveData<List<DataItem>> items;
     private IFirebaseDatabaseRepository.FirebaseDatabaseRepositoryCallback<DataItem> callback;
+    private MediatorLiveData<LiveDataEvent<Resource<DataItem>>> saveItemSingleEvent;
+    private MediatorLiveData<LiveDataEvent<Resource<DataItem>>> deleteItemSingleEvent;
 
     private SnackbarMessage itemAddedMessage = new SnackbarMessage();
 
@@ -70,12 +74,12 @@ public class ItemsViewModel extends ViewModel {
     }
 
     @MainThread
-    public LiveData<LiveDataEvent<Resource<DataItem>>> getSaveItemEvent() {
+    public LiveData<LiveDataEventWithTaggedObservers<Resource<DataItem>>> getSaveItemEvent() {
         return repo.getSaveModelEvent();
     }
 
     @MainThread
-    public LiveData<LiveDataEvent<Resource<DataItem>>> getDeleteItemEvent() {
+    public LiveData<LiveDataEventWithTaggedObservers<Resource<DataItem>>> getDeleteItemEvent() {
         return repo.getDeleteModelEvent();
     }
 
