@@ -19,4 +19,6 @@
     <string name="error_loading_item">Item could not be loaded</string>
     <string name="error_saving_item">Item could not be saved</string>
     <string name="error_removing_item">Item could not be removed</string>
+    <string name="error_loading_user">User could not be loaded</string>
+    <string name="error_registering_user">User could not be saved</string>
 </resources>

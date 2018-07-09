@@ -36,6 +36,7 @@ dependencies {
     implementation "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
     implementation "com.android.support.constraint:constraint-layout:$rootProject.constraintLayoutVersion"
     implementation "com.android.support:support-v4:$rootProject.supportLibraryVersion"
+    implementation "com.firebaseui:firebase-ui-auth:$rootProject.firebaseUiVersion"
     implementation "com.google.firebase:firebase-database:$rootProject.firebaseVersion"
     testImplementation "junit:junit:$jUnitVersion"
     androidTestImplementation "com.android.support.test:runner:$rootProject.testRunnerVersion"

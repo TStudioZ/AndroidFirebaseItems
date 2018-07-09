@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProvider;
 
 import com.tstudioz.androidfirebaseitems.viewmodel.ItemViewModel;
 import com.tstudioz.androidfirebaseitems.viewmodel.ItemsViewModel;
+import com.tstudioz.androidfirebaseitems.viewmodel.UserViewModel;
 import com.tstudioz.essentialuilibrary.dagger.ViewModelKey;
 import com.tstudioz.essentialuilibrary.viewmodel.ViewModelFactory;
 
@@ -24,6 +25,11 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(ItemsViewModel.class)
     abstract ViewModel bindItemsViewModel(ItemsViewModel itemsViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(UserViewModel.class)
+    abstract ViewModel bindUserViewModel(UserViewModel userViewModel);
 
     @Binds
     abstract ViewModelProvider.Factory bindViewModelFactory(ViewModelFactory factory);

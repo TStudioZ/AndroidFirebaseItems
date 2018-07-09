@@ -35,5 +35,6 @@ ext {
     jUnitVersion = '4.12'
     testRunnerVersion = '1.0.2'
     espressoVersion = '3.0.2'
+    firebaseUiVersion = '4.0.0'
     firebaseVersion = '16.0.1'
 }

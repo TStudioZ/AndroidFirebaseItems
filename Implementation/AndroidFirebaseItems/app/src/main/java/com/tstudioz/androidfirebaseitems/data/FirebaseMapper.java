@@ -16,9 +16,7 @@ public abstract class FirebaseMapper<Entity, Model> implements IMapper<Entity, M
     public List<Model> mapList(DataSnapshot dataSnapshot) {
         List<Model> list = new ArrayList<>();
         for (DataSnapshot item : dataSnapshot.getChildren()) {
-            for (DataSnapshot i : item.getChildren()) {
-                list.add(map(i.getKey(), i));
-            }
+            list.add(map(item.getKey(), item));
         }
         return list;
     }

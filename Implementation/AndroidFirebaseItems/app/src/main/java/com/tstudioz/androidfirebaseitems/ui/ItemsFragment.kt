@@ -1,8 +1,10 @@
 package com.tstudioz.androidfirebaseitems.ui
 
+import android.app.Activity.RESULT_OK
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.v7.widget.RecyclerView
@@ -10,15 +12,27 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.firebase.ui.auth.AuthUI
+import com.firebase.ui.auth.IdpResponse
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.tstudioz.androidfirebaseitems.R
 import com.tstudioz.androidfirebaseitems.data.DataItem
 import com.tstudioz.androidfirebaseitems.data.Status
 import com.tstudioz.androidfirebaseitems.viewmodel.ItemsViewModel
+import com.tstudioz.androidfirebaseitems.viewmodel.UserViewModel
 import com.tstudioz.essentialuilibrary.ui.BaseFragment
 import com.tstudioz.essentialuilibrary.ui.RecyclerViewItemsAdapter
 import com.tstudioz.essentialuilibrary.util.ActivityUtils
 import com.tstudioz.essentialuilibrary.util.FragmentUtils
 import com.tstudioz.essentialuilibrary.util.SnackbarUtils
+import java.util.*
+
+
+
+
+
+private const val RC_SIGN_IN = 123
 
 class ItemsFragment : BaseFragment() {
 
@@ -28,7 +42,8 @@ class ItemsFragment : BaseFragment() {
 
     private lateinit var adapter: RecyclerViewItemsAdapter<DataItem, DataItemViewHolder>
 
-    private lateinit var viewModel: ItemsViewModel
+    private lateinit var viewModelUser: UserViewModel
+    private lateinit var viewModelItems: ItemsViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -45,25 +60,86 @@ class ItemsFragment : BaseFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        viewModel = ViewModelProviders.of(this, viewModelFactory)
+        viewModelUser = ViewModelProviders.of(this, viewModelFactory)
+                .get(UserViewModel::class.java)
+        viewModelItems = ViewModelProviders.of(this, viewModelFactory)
                 .get(ItemsViewModel::class.java)
-        observeData()
+
+        if (checkLogin()) {
+            observeUser(FirebaseAuth.getInstance().currentUser!!.uid)
+        } else {
+            showLogin()
+        }
+    }
+
+    private fun checkLogin(): Boolean {
+        val auth = FirebaseAuth.getInstance()
+        if (auth.currentUser == null)
+            return false
+        return true
+    }
+
+    private fun showLogin() {
+        // Choose authentication providers
+        val providers = Arrays.asList(
+            AuthUI.IdpConfig.GoogleBuilder().build())
+
+        // Create and launch sign-in intent
+        startActivityForResult(
+            AuthUI.getInstance()
+                .createSignInIntentBuilder()
+                .setAvailableProviders(providers)
+                .build(),
+            RC_SIGN_IN)
+    }
+
+    private fun finishLogin(user: FirebaseUser) {
+        observeUser(user.uid)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == RC_SIGN_IN) {
+            val response = IdpResponse.fromResultIntent(data)
+
+            if (resultCode == RESULT_OK) {
+                // Successfully signed in
+                val user = FirebaseAuth.getInstance().currentUser
+                // ...
+                finishLogin(user!!)
+            } else {
+                // Sign in failed. If response is null the user canceled the
+                // sign-in flow using the back button. Otherwise check
+                // response.getError().getErrorCode() and handle the error.
+                // ...
+            }
+        }
+    }
+
+    private fun observeUser(uid: String) {
+        viewModelUser.registerLoadUser(uid).observe(this, Observer {
+            observeData()
+        })
+        viewModelUser.errorMessage.observe(this, Observer {
+            SnackbarUtils.showSnackbar(view, getString(it!!))
+        })
     }
 
     private fun observeData() {
-        viewModel.items.observe(this, Observer {
+        viewModelItems.items.observe(this, Observer {
             if (it != null) {
                 adapter.setItems(it)
             }
         })
-        viewModel.saveItemEvent.observe(this, Observer {
+        viewModelItems.saveItemEvent.observe(this, Observer {
             when (it?.getContentIfNotHandled(TAG)?.status?.status) {
                 Status.SUCCESS -> {
                     SnackbarUtils.showSnackbar(view, getString(R.string.item_added))
                 }
             }
         })
-        viewModel.deleteItemEvent.observe(this, Observer {
+        viewModelItems.deleteItemEvent.observe(this, Observer {
             when (it?.getContentIfNotHandled(TAG)?.status?.status) {
                 Status.SUCCESS -> {
                     SnackbarUtils.showSnackbar(view, getString(R.string.item_removed))

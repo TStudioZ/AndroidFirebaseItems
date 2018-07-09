@@ -49,14 +49,14 @@ public abstract class FirebaseDatabaseRepository<Model, Entity> implements IFire
     public void addListener(FirebaseDatabaseRepositoryCallback<Model> callback) {
         BaseValueEventListener<Model, Entity> listener = new BaseValueEventListener<>(mapper, callback);
         listenerMap.put(callback, listener);
-        dbReference.addValueEventListener(listener);
+        dbReference.child(getModelsNode()).addValueEventListener(listener);
     }
 
     @Override
     public void removeListener(FirebaseDatabaseRepositoryCallback<Model> callback) {
         if (listenerMap.containsKey(callback)) {
             BaseValueEventListener<Model, Entity> listener = listenerMap.remove(callback);
-            dbReference.removeEventListener(listener);
+            dbReference.child(getModelsNode()).removeEventListener(listener);
         }
     }
 
