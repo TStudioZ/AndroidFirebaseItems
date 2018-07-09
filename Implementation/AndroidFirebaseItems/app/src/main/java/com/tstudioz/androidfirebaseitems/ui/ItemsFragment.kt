@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -16,27 +15,12 @@ import com.tstudioz.androidfirebaseitems.data.DataItem
 import com.tstudioz.androidfirebaseitems.viewmodel.ItemsViewModel
 import com.tstudioz.essentialuilibrary.ui.BaseFragment
 import com.tstudioz.essentialuilibrary.ui.RecyclerViewItemsAdapter
+import com.tstudioz.essentialuilibrary.util.ActivityUtils
 import com.tstudioz.essentialuilibrary.util.FragmentUtils
 import com.tstudioz.essentialuilibrary.util.SnackbarUtils
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Activities that contain this fragment must implement the
- * [ItemsFragment.OnFragmentInteractionListener] interface
- * to handle interaction events.
- * Use the [ItemsFragment.newInstance] factory method to
- * create an instance of this fragment.
- *
- */
 class ItemsFragment : BaseFragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+
     private var listener: OnFragmentInteractionListener? = null
 
     private var columnCount = 1;
@@ -44,14 +28,6 @@ class ItemsFragment : BaseFragment() {
     private lateinit var adapter: RecyclerViewItemsAdapter<DataItem, DataItemViewHolder>;
 
     private lateinit var viewModel: ItemsViewModel;
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -89,7 +65,9 @@ class ItemsFragment : BaseFragment() {
     private fun setupAdapter(): RecyclerViewItemsAdapter<DataItem, DataItemViewHolder> {
         return RecyclerViewItemsAdapter(object : RecyclerViewItemsAdapter.OnItemRecyclerViewListener<DataItem> {
             override fun onItemSelected(item: DataItem) {
-
+                val extras = Bundle()
+                extras.putString(EXTRA_ITEM_KEY, item.key)
+                ActivityUtils.startActivity(activity, AddEditItemActivity::class.java, extras)
             }
         }, object : RecyclerViewItemsAdapter.DiffCallback<DataItem> {
             override fun areItemsTheSame(item1: DataItem, item2: DataItem): Boolean {
@@ -153,25 +131,5 @@ class ItemsFragment : BaseFragment() {
     interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         fun onFragmentInteraction(uri: Uri)
-    }
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ItemsFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-                ItemsFragment().apply {
-                    arguments = Bundle().apply {
-                        putString(ARG_PARAM1, param1)
-                        putString(ARG_PARAM2, param2)
-                    }
-                }
     }
 }

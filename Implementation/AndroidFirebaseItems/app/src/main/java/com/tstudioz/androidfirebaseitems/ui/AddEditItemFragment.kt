@@ -1,5 +1,6 @@
 package com.tstudioz.androidfirebaseitems.ui
 
+import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -8,14 +9,13 @@ import android.widget.TextView
 import com.julianraj.validatedtextinputlayout.ValidatedTextInputLayout
 import com.tstudioz.androidfirebaseitems.R
 import com.tstudioz.androidfirebaseitems.data.DataItem
+import com.tstudioz.androidfirebaseitems.viewmodel.ItemViewModel
 import com.tstudioz.androidfirebaseitems.viewmodel.ItemsViewModel
 import com.tstudioz.essentialuilibrary.ui.BaseFragment
+import com.tstudioz.essentialuilibrary.util.SnackbarUtils
 import kotlinx.android.synthetic.main.fragment_add_edit_item.*
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+private const val ARG_ITEM_KEY = "itemKey"
 
 /**
  * A simple [Fragment] subclass.
@@ -26,10 +26,17 @@ class AddEditItemFragment : BaseFragment() {
     private lateinit var nameInput: ValidatedTextInputLayout;
     private lateinit var countInput: ValidatedTextInputLayout;
 
-    private lateinit var viewModel: ItemsViewModel;
+    private lateinit var viewModelItem: ItemViewModel
+    private lateinit var viewModelItems: ItemsViewModel
+
+    private var itemKey: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState);
+
+        arguments?.let {
+            itemKey = it.getString(ARG_ITEM_KEY)
+        }
 
         setHasOptionsMenu(true);
     }
@@ -51,12 +58,22 @@ class AddEditItemFragment : BaseFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState);
 
-        viewModel = ViewModelProviders.of(this, viewModelFactory)
+        viewModelItem = ViewModelProviders.of(this, viewModelFactory)
+                .get(ItemViewModel::class.java);
+        viewModelItems = ViewModelProviders.of(this, viewModelFactory)
                 .get(ItemsViewModel::class.java);
         observeData();
     }
 
     private fun observeData() {
+        if (itemKey != null) {
+            viewModelItem.loadItem(itemKey).observe(this, Observer {
+                populateFields(it!!)
+            })
+        }
+        viewModelItem.errorMessage.observe(this, Observer {
+            SnackbarUtils.showSnackbar(view, getString(it!!))
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -71,6 +88,11 @@ class AddEditItemFragment : BaseFragment() {
             else -> return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    private fun populateFields(item: DataItem) {
+        nameInput.editText?.setText(item.name)
+        countInput.editText?.setText(item.count.toString())
     }
 
     private fun submit() {
@@ -93,8 +115,20 @@ class AddEditItemFragment : BaseFragment() {
     private fun saveItem() {
         val name = nameInput.editText?.text.toString();
         val count = countInput.editText?.text.toString().toInt();
-        val item = DataItem(name, count);
-        viewModel.saveItem(item);
+        val item = DataItem(itemKey, name, count);
+        viewModelItems.saveItem(item);
         activity?.finish();
+    }
+
+    companion object {
+        @JvmStatic
+        fun newInstance(itemKey: String? = null) =
+                AddEditItemFragment().apply {
+                    if (itemKey != null) {
+                        arguments = Bundle().apply {
+                            putString(ARG_ITEM_KEY, itemKey)
+                        }
+                    }
+                }
     }
 }

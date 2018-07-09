@@ -18,4 +18,14 @@ public class DataItemRepository extends FirebaseDatabaseRepository<DataItem, Dat
     protected String getModelsNode() {
         return "items";
     }
+
+    @Override
+    protected String getModelKey(DataItem dataItem) {
+        return dataItem.getKey();
+    }
+
+    @Override
+    protected void setModelKey(DataItem dataItem, String key) {
+        dataItem.setKey(key);
+    }
 }

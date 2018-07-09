@@ -7,11 +7,17 @@ import java.util.List;
 public interface IFirebaseDatabaseRepository<Model> {
     void addListener(FirebaseDatabaseRepositoryCallback<Model> callback);
     void removeListener(FirebaseDatabaseRepositoryCallback<Model> callback);
+    void loadModel(String key, DataItemCallback<Model> callback);
     void save(Model model);
     SingleLiveEvent<Model> getSaveModelEvent();
 
     interface FirebaseDatabaseRepositoryCallback<T> {
         void onSuccess(List<T> result);
+        void onError(Exception e);
+    }
+
+    interface DataItemCallback<T> {
+        void onSuccess(T result);
         void onError(Exception e);
     }
 }

@@ -52,10 +52,12 @@ public class ItemsViewModel extends ViewModel {
         return items;
     }
 
+    @MainThread
     private void loadItems() {
         repo.addListener(callback);
     }
 
+    @MainThread
     public void saveItem(DataItem item) {
         repo.save(item);
     }

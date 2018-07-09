@@ -8,8 +8,7 @@
     tools:context=".ui.AddEditItemActivity"
     tools:menu="menu_main">
 
-    <fragment android:id="@+id/fragmentAddEditItem"
-        android:name="com.tstudioz.androidfirebaseitems.ui.AddEditItemFragment"
+    <FrameLayout android:id="@+id/frameAddEditItemFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout="@layout/fragment_add_edit_item" />

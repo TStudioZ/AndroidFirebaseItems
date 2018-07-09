@@ -8,7 +8,7 @@ public class DataItemMapper extends FirebaseMapper<DataItemEntity, DataItem> {
     }
 
     @Override
-    public DataItem mapToDestination(DataItemEntity dataItemEntity) {
-        return new DataItem(dataItemEntity.getName(), dataItemEntity.getCount());
+    public DataItem mapToDestination(String key, DataItemEntity dataItemEntity) {
+        return new DataItem(key, dataItemEntity.getName(), dataItemEntity.getCount());
     }
 }

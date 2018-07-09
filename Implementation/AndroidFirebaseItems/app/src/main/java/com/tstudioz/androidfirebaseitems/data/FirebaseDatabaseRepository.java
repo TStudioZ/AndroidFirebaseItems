@@ -1,7 +1,12 @@
 package com.tstudioz.androidfirebaseitems.data;
 
+import android.support.annotation.NonNull;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.tstudioz.essentialuilibrary.viewmodel.SingleLiveEvent;
 
 import java.util.HashMap;
@@ -22,6 +27,8 @@ public abstract class FirebaseDatabaseRepository<Model, Entity> implements IFire
 
     protected abstract String getRootNode();
     protected abstract String getModelsNode();
+    protected abstract String getModelKey(Model model);
+    protected abstract void setModelKey(Model model, String key);
 
     public FirebaseDatabaseRepository(FirebaseMapper<Entity, Model> mapper) {
         this.dbReference = FirebaseDatabase.getInstance().getReference();
@@ -45,10 +52,34 @@ public abstract class FirebaseDatabaseRepository<Model, Entity> implements IFire
     }
 
     @Override
+    public void loadModel(String key, DataItemCallback<Model> callback) {
+        DatabaseReference ref = dbReference.child(getModelsNode()).child(key);
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Model model = mapper.map(key, dataSnapshot);
+                callback.onSuccess(model);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                callback.onError(databaseError.toException());
+            }
+        });
+    }
+
+    @Override
     public void save(Model model) {
         Entity entity = mapper.mapToSource(model);
-        DatabaseReference ref = dbReference.child(getModelsNode()).push();
+        DatabaseReference ref;
+        String key = getModelKey(model);
+        if (key == null) {
+            ref = dbReference.child(getModelsNode()).push();
+        } else {
+            ref = dbReference.child(getModelsNode()).child(key);
+        }
         ref.setValue(entity).addOnSuccessListener(aVoid -> {
+            setModelKey(model, ref.getKey());
             saveModelEvent.setValue(model);
         });
     }
