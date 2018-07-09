@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.tstudioz.androidfirebaseitems.R
 import com.tstudioz.androidfirebaseitems.data.DataItem
+import com.tstudioz.androidfirebaseitems.data.Status
 import com.tstudioz.androidfirebaseitems.viewmodel.ItemsViewModel
 import com.tstudioz.essentialuilibrary.ui.BaseFragment
 import com.tstudioz.essentialuilibrary.ui.RecyclerViewItemsAdapter
@@ -23,41 +24,50 @@ class ItemsFragment : BaseFragment() {
 
     private var listener: OnFragmentInteractionListener? = null
 
-    private var columnCount = 1;
+    private var columnCount = 1
 
-    private lateinit var adapter: RecyclerViewItemsAdapter<DataItem, DataItemViewHolder>;
+    private lateinit var adapter: RecyclerViewItemsAdapter<DataItem, DataItemViewHolder>
 
-    private lateinit var viewModel: ItemsViewModel;
+    private lateinit var viewModel: ItemsViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_items, container, false);
+        val view = inflater.inflate(R.layout.fragment_items, container, false)
 
-        val itemsRecyclerView = view.findViewById<RecyclerView>(R.id.itemList);
-        FragmentUtils.setupLayoutManagerForRecyclerView(context, itemsRecyclerView, columnCount);
-        adapter = setupAdapter();
-        itemsRecyclerView.adapter = adapter;
+        val itemsRecyclerView = view.findViewById<RecyclerView>(R.id.itemList)
+        FragmentUtils.setupLayoutManagerForRecyclerView(context, itemsRecyclerView, columnCount)
+        adapter = setupAdapter()
+        itemsRecyclerView.adapter = adapter
 
-        return view;
+        return view
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState);
+        super.onActivityCreated(savedInstanceState)
 
         viewModel = ViewModelProviders.of(this, viewModelFactory)
-                .get(ItemsViewModel::class.java);
-        observeData();
+                .get(ItemsViewModel::class.java)
+        observeData()
     }
 
     private fun observeData() {
         viewModel.items.observe(this, Observer {
             if (it != null) {
-                adapter.setItems(it);
+                adapter.setItems(it)
             }
         })
         viewModel.saveItemEvent.observe(this, Observer {
-            if (it != null) {
-                SnackbarUtils.showSnackbar(view, getString(R.string.item_added))
+            when (it?.contentIfNotHandled?.status?.status) {
+                Status.SUCCESS -> {
+                    SnackbarUtils.showSnackbar(view, getString(R.string.item_added))
+                }
+            }
+        })
+        viewModel.deleteItemEvent.observe(this, Observer {
+            when (it?.contentIfNotHandled?.status?.status) {
+                Status.SUCCESS -> {
+                    SnackbarUtils.showSnackbar(view, getString(R.string.item_removed))
+                }
             }
         })
     }
@@ -71,31 +81,31 @@ class ItemsFragment : BaseFragment() {
             }
         }, object : RecyclerViewItemsAdapter.DiffCallback<DataItem> {
             override fun areItemsTheSame(item1: DataItem, item2: DataItem): Boolean {
-                return item1.name == item2.name;
+                return item1.name == item2.name
             }
 
             override fun areContentsTheSame(item1: DataItem, item2: DataItem): Boolean {
-                return item1.name == item2.name;
+                return item1.name == item2.name
             }
 
         }, object : RecyclerViewItemsAdapter.ViewHolderHandler<DataItem, DataItemViewHolder> {
             override fun getLayoutId(viewType: Int): Int {
-                return R.layout.data_item_row;
+                return R.layout.data_item_row
             }
 
             override fun createViewHolder(view: View): DataItemViewHolder {
-                return DataItemViewHolder(view);
+                return DataItemViewHolder(view)
             }
 
             override fun bind(holder: DataItemViewHolder, item: DataItem) {
-                holder.nameView.text = item.name;
+                holder.nameView.text = item.name
             }
 
-        });
+        })
     }
 
     private class DataItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val nameView: TextView = view.findViewById(R.id.tvName);
+        val nameView: TextView = view.findViewById(R.id.tvName)
     }
 
     // TODO: Rename method, update argument and hook method into UI event

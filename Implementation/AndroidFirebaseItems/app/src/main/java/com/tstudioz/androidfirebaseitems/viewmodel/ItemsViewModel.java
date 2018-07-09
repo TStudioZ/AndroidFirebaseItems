@@ -4,10 +4,12 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.support.annotation.MainThread;
+import android.support.annotation.NonNull;
 
 import com.tstudioz.androidfirebaseitems.data.DataItem;
 import com.tstudioz.androidfirebaseitems.data.IFirebaseDatabaseRepository;
-import com.tstudioz.essentialuilibrary.viewmodel.SingleLiveEvent;
+import com.tstudioz.androidfirebaseitems.data.Resource;
+import com.tstudioz.essentialuilibrary.viewmodel.LiveDataEvent;
 import com.tstudioz.essentialuilibrary.viewmodel.SnackbarMessage;
 
 import java.util.List;
@@ -58,12 +60,23 @@ public class ItemsViewModel extends ViewModel {
     }
 
     @MainThread
-    public void saveItem(DataItem item) {
+    public void saveItem(@NonNull DataItem item) {
         repo.save(item);
     }
 
-    public SingleLiveEvent<DataItem> getSaveItemEvent() {
+    @MainThread
+    public void deleteItem(@NonNull DataItem item) {
+        repo.delete(item);
+    }
+
+    @MainThread
+    public LiveData<LiveDataEvent<Resource<DataItem>>> getSaveItemEvent() {
         return repo.getSaveModelEvent();
+    }
+
+    @MainThread
+    public LiveData<LiveDataEvent<Resource<DataItem>>> getDeleteItemEvent() {
+        return repo.getDeleteModelEvent();
     }
 
     @Override

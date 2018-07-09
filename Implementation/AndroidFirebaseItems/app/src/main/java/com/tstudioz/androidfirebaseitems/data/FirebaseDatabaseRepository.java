@@ -1,13 +1,16 @@
 package com.tstudioz.androidfirebaseitems.data;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.tstudioz.essentialuilibrary.viewmodel.SingleLiveEvent;
+import com.tstudioz.essentialuilibrary.viewmodel.LiveDataEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,11 +21,17 @@ public abstract class FirebaseDatabaseRepository<Model, Entity> implements IFire
     private final FirebaseMapper<Entity, Model> mapper;
     private Map<FirebaseDatabaseRepositoryCallback<Model>, BaseValueEventListener<Model, Entity>> listenerMap;
 
-    private SingleLiveEvent<Model> saveModelEvent = new SingleLiveEvent<>();
+    private MutableLiveData<LiveDataEvent<Resource<Model>>> saveModelEvent = new MutableLiveData<>();
+    private MutableLiveData<LiveDataEvent<Resource<Model>>> deleteModelEvent = new MutableLiveData<>();
 
     @Override
-    public SingleLiveEvent<Model> getSaveModelEvent() {
+    public LiveData<LiveDataEvent<Resource<Model>>> getSaveModelEvent() {
         return saveModelEvent;
+    }
+
+    @Override
+    public LiveData<LiveDataEvent<Resource<Model>>> getDeleteModelEvent() {
+        return deleteModelEvent;
     }
 
     protected abstract String getRootNode();
@@ -78,9 +87,27 @@ public abstract class FirebaseDatabaseRepository<Model, Entity> implements IFire
         } else {
             ref = dbReference.child(getModelsNode()).child(key);
         }
-        ref.setValue(entity).addOnSuccessListener(aVoid -> {
+        listenForResult(ref, model, ref.setValue(entity), saveModelEvent);
+    }
+
+    @Override
+    public void delete(Model model) {
+        String key = getModelKey(model);
+        if (key == null) return;
+
+        DatabaseReference ref = dbReference.child(getModelsNode()).child(key);
+        listenForResult(ref, model, ref.removeValue(), deleteModelEvent);
+    }
+
+    private <T> void listenForResult(DatabaseReference ref,
+                                     Model model,
+                                     Task<T> task,
+                                     MutableLiveData<LiveDataEvent<Resource<Model>>> event) {
+        task.addOnSuccessListener(aVoid -> {
             setModelKey(model, ref.getKey());
-            saveModelEvent.setValue(model);
+            event.setValue(new LiveDataEvent<>(Resource.success(model)));
+        }).addOnFailureListener(e -> {
+            event.setValue(new LiveDataEvent<>(Resource.error(e, model)));
         });
     }
 }

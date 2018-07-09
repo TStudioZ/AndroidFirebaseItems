@@ -12,7 +12,11 @@
     <string name="error_count_zero">Count must be positive.</string>
     <string name="action_add_item">Add item</string>
     <string name="action_done">Done</string>
+    <string name="action_delete">Delete</string>
     <string name="hint_item_count">Count</string>
     <string name="item_added">Item added</string>
+    <string name="item_removed">Item removed</string>
     <string name="error_loading_item">Item could not be loaded</string>
+    <string name="error_saving_item">Item could not be saved</string>
+    <string name="error_removing_item">Item could not be removed</string>
 </resources>

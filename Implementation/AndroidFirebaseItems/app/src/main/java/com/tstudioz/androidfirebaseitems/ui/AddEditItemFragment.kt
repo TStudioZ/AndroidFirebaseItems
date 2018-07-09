@@ -9,6 +9,7 @@ import android.widget.TextView
 import com.julianraj.validatedtextinputlayout.ValidatedTextInputLayout
 import com.tstudioz.androidfirebaseitems.R
 import com.tstudioz.androidfirebaseitems.data.DataItem
+import com.tstudioz.androidfirebaseitems.data.Status
 import com.tstudioz.androidfirebaseitems.viewmodel.ItemViewModel
 import com.tstudioz.androidfirebaseitems.viewmodel.ItemsViewModel
 import com.tstudioz.essentialuilibrary.ui.BaseFragment
@@ -23,101 +24,136 @@ private const val ARG_ITEM_KEY = "itemKey"
  */
 class AddEditItemFragment : BaseFragment() {
 
-    private lateinit var nameInput: ValidatedTextInputLayout;
-    private lateinit var countInput: ValidatedTextInputLayout;
+    private lateinit var nameInput: ValidatedTextInputLayout
+    private lateinit var countInput: ValidatedTextInputLayout
 
     private lateinit var viewModelItem: ItemViewModel
     private lateinit var viewModelItems: ItemsViewModel
 
     private var itemKey: String? = null
+    private var item: DataItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState)
 
         arguments?.let {
             itemKey = it.getString(ARG_ITEM_KEY)
         }
 
-        setHasOptionsMenu(true);
+        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_add_edit_item, container, false);
+        val view = inflater.inflate(R.layout.fragment_add_edit_item, container, false)
 
-        nameInput = view.findViewById(R.id.inputItemName);
-        countInput = view.findViewById(R.id.inputItemCount);
+        nameInput = view.findViewById(R.id.inputItemName)
+        countInput = view.findViewById(R.id.inputItemCount)
 
         TextView(activity).apply {
             setText(R.string.hello_blank_fragment)
         }
 
-        return view;
+        return view
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState);
+        super.onActivityCreated(savedInstanceState)
 
         viewModelItem = ViewModelProviders.of(this, viewModelFactory)
-                .get(ItemViewModel::class.java);
+                .get(ItemViewModel::class.java)
         viewModelItems = ViewModelProviders.of(this, viewModelFactory)
-                .get(ItemsViewModel::class.java);
-        observeData();
+                .get(ItemsViewModel::class.java)
+        observeData()
     }
 
     private fun observeData() {
         if (itemKey != null) {
             viewModelItem.loadItem(itemKey).observe(this, Observer {
-                populateFields(it!!)
+                item = it!!
+                populateFields()
             })
         }
         viewModelItem.errorMessage.observe(this, Observer {
             SnackbarUtils.showSnackbar(view, getString(it!!))
         })
+        viewModelItems.saveItemEvent.observe(this, Observer {
+            when (it?.peekContentIfNotHandled()?.status?.status) {
+                Status.SUCCESS -> {
+                    activity?.finish()
+                }
+                Status.ERROR -> {
+                    SnackbarUtils.showSnackbar(view, getString(R.string.error_saving_item))
+                }
+            }
+        })
+        viewModelItems.deleteItemEvent.observe(this, Observer {
+            when (it?.peekContentIfNotHandled()?.status?.status) {
+                Status.SUCCESS -> {
+                    activity?.finish()
+                }
+                Status.ERROR -> {
+                    SnackbarUtils.showSnackbar(view, getString(R.string.error_removing_item))
+                }
+            }
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu_add_item, menu);
+        if (itemKey != null)
+            inflater.inflate(R.menu.menu_edit_item, menu)
+        else
+            inflater.inflate(R.menu.menu_add_item, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_done -> {
-                submit();
+                submit()
             }
-            else -> return super.onOptionsItemSelected(item);
+            R.id.action_delete -> {
+                deleteItem()
+            }
+            else -> return super.onOptionsItemSelected(item)
         }
-        return true;
+        return true
     }
 
-    private fun populateFields(item: DataItem) {
-        nameInput.editText?.setText(item.name)
-        countInput.editText?.setText(item.count.toString())
+    private fun populateFields() {
+        item?.run {
+            nameInput.editText?.setText(name)
+            countInput.editText?.setText(count.toString())
+        }
     }
 
     private fun submit() {
         if (!validateFields())
-            return;
-        saveItem();
+            return
+        saveItem()
     }
 
     private fun validateFields(): Boolean {
-        var flag = true;
+        var flag = true
         if (!nameInput.validate()) {
-            flag = false;
+            flag = false
         }
         if (!inputItemCount.validate()) {
-            flag = false;
+            flag = false
         }
-        return flag;
+        return flag
+    }
+
+    private fun deleteItem() {
+        item?.let {
+            viewModelItems.deleteItem(it)
+        }
     }
 
     private fun saveItem() {
-        val name = nameInput.editText?.text.toString();
-        val count = countInput.editText?.text.toString().toInt();
-        val item = DataItem(itemKey, name, count);
-        viewModelItems.saveItem(item);
-        activity?.finish();
+        val name = nameInput.editText?.text.toString()
+        val count = countInput.editText?.text.toString().toInt()
+        val item = DataItem(itemKey, name, count)
+        viewModelItems.saveItem(item)
     }
 
     companion object {

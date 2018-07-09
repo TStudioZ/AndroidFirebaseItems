@@ -1,6 +1,8 @@
 package com.tstudioz.androidfirebaseitems.data;
 
-import com.tstudioz.essentialuilibrary.viewmodel.SingleLiveEvent;
+import android.arch.lifecycle.LiveData;
+
+import com.tstudioz.essentialuilibrary.viewmodel.LiveDataEvent;
 
 import java.util.List;
 
@@ -9,7 +11,9 @@ public interface IFirebaseDatabaseRepository<Model> {
     void removeListener(FirebaseDatabaseRepositoryCallback<Model> callback);
     void loadModel(String key, DataItemCallback<Model> callback);
     void save(Model model);
-    SingleLiveEvent<Model> getSaveModelEvent();
+    void delete(Model model);
+    LiveData<LiveDataEvent<Resource<Model>>> getSaveModelEvent();
+    LiveData<LiveDataEvent<Resource<Model>>> getDeleteModelEvent();
 
     interface FirebaseDatabaseRepositoryCallback<T> {
         void onSuccess(List<T> result);

@@ -11,29 +11,29 @@ import dagger.android.HasActivityInjector
 class FirebaseItemsApp : DaggerApplication(), HasActivityInjector {
 
     override fun applicationInjector(): AndroidInjector<out DaggerApplication> {
-        return DaggerAppComponent.builder().create(this);
+        return DaggerAppComponent.builder().create(this)
     }
 
     override fun onCreate() {
-        super.onCreate();
+        super.onCreate()
 
         if (BuildConfig.DEBUG) {
-            enableStrictMode();
+            enableStrictMode()
         }
 
-        AppInjector.init(this);
+        AppInjector.init(this)
     }
 
     private fun enableStrictMode() {
         StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder()
                 .detectAll()
                 .penaltyLog()
-                .build());
+                .build())
         StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder()
                 .detectLeakedSqlLiteObjects()
                 .detectLeakedClosableObjects()
                 .penaltyLog()
                 .penaltyDeath()
-                .build());
+                .build())
     }
 }
