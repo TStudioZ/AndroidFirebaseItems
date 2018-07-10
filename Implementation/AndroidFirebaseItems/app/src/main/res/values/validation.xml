@@ -2,4 +2,6 @@
 <resources>
     <string name="regex_item_name" translatable="false">[\\p{L}\\p{M}0-9 \\-.\',]*</string>
     <string name="regex_item_count" translatable="false">^[1-9]\d*$</string>
+    <integer name="item_name_min_length">3</integer>
+    <integer name="item_name_max_length">50</integer>
 </resources>

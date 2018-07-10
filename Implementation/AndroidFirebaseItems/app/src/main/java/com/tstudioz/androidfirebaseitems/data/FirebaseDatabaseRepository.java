@@ -18,7 +18,7 @@ import java.util.Map;
 public abstract class FirebaseDatabaseRepository<Model, Entity> implements IFirebaseDatabaseRepository<Model> {
 
     private final DatabaseReference dbReference;
-    private final FirebaseMapper<Entity, Model> mapper;
+    protected final FirebaseMapper<Entity, Model> mapper;
     private Map<FirebaseDatabaseRepositoryCallback<Model>, BaseValueEventListener<Model, Entity>> listenerMap;
 
     private MutableLiveData<LiveDataEventWithTaggedObservers<Resource<Model>>> saveModelEvent = new MutableLiveData<>();
@@ -38,6 +38,8 @@ public abstract class FirebaseDatabaseRepository<Model, Entity> implements IFire
     protected abstract String getModelsNode();
     protected abstract String getModelKey(Model model);
     protected abstract void setModelKey(Model model, String key);
+    protected abstract Model cloneModel(Model model);
+    protected abstract void updateCountImpl(boolean increase, DatabaseReference ref, Model model, DataItemCallback<Model> callback);
 
     public FirebaseDatabaseRepository(FirebaseMapper<Entity, Model> mapper) {
         this.dbReference = FirebaseDatabase.getInstance().getReference();
@@ -61,20 +63,24 @@ public abstract class FirebaseDatabaseRepository<Model, Entity> implements IFire
     }
 
     @Override
-    public void loadModel(String key, DataItemCallback<Model> callback) {
+    public LiveData<Resource<Model>> loadModel(String key) {
+        MutableLiveData<Resource<Model>> res = new MutableLiveData<>();
+        res.setValue(Resource.working(null));
+
         DatabaseReference ref = dbReference.child(getModelsNode()).child(key);
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Model model = mapper.map(key, dataSnapshot);
-                callback.onSuccess(model);
+                res.setValue(Resource.success(model));
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                callback.onError(databaseError.toException());
+                res.setValue(Resource.error(databaseError.toException(), null));
             }
         });
+        return res;
     }
 
     @Override
@@ -97,6 +103,40 @@ public abstract class FirebaseDatabaseRepository<Model, Entity> implements IFire
 
         DatabaseReference ref = dbReference.child(getModelsNode()).child(key);
         listenForResult(ref, model, ref.removeValue(), deleteModelEvent);
+    }
+
+    @Override
+    public LiveData<Resource<Model>> decreaseCount(Model model) {
+        return updateCount(model, false);
+    }
+
+    @Override
+    public LiveData<Resource<Model>> increaseCount(Model model) {
+        return updateCount(model, true);
+    }
+
+    private LiveData<Resource<Model>> updateCount(Model model, boolean increase) {
+        MutableLiveData<Resource<Model>> res = new MutableLiveData<>();
+        res.setValue(Resource.working(null));
+
+        Model cloned = cloneModel(model);
+        String key = getModelKey(model);
+
+        DataItemCallback<Model> callback = new DataItemCallback<Model>() {
+            @Override
+            public void onSuccess(Model result) {
+                res.setValue(Resource.success(result));
+            }
+
+            @Override
+            public void onError(Exception e) {
+                res.setValue(Resource.error(e, null));
+            }
+        };
+
+        DatabaseReference ref = dbReference.child(getModelsNode()).child(key);
+        updateCountImpl(increase, ref, model, callback);
+        return res;
     }
 
     private <T> void listenForResult(DatabaseReference ref,

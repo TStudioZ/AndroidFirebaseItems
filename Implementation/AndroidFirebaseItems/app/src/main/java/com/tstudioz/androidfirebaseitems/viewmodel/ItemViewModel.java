@@ -1,25 +1,21 @@
 package com.tstudioz.androidfirebaseitems.viewmodel;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.support.annotation.MainThread;
 
-import com.tstudioz.androidfirebaseitems.R;
 import com.tstudioz.androidfirebaseitems.data.DataItem;
 import com.tstudioz.androidfirebaseitems.data.IFirebaseDatabaseRepository;
-import com.tstudioz.essentialuilibrary.viewmodel.SingleLiveEvent;
-import com.tstudioz.essentialuilibrary.viewmodel.SnackbarMessage;
+import com.tstudioz.androidfirebaseitems.data.Resource;
+import com.tstudioz.essentialuilibrary.viewmodel.LiveDataEvent;
 
 import javax.inject.Inject;
 
 public class ItemViewModel extends ViewModel {
 
     private IFirebaseDatabaseRepository<DataItem> repo;
-    private SingleLiveEvent<DataItem> dataItem;
-    private SnackbarMessage errorMessage = new SnackbarMessage();
-
-    public SnackbarMessage getErrorMessage() {
-        return errorMessage;
-    }
+    private MediatorLiveData<LiveDataEvent<Resource<DataItem>>> dataItem;
 
     @Inject
     public ItemViewModel(final IFirebaseDatabaseRepository<DataItem> repo) {
@@ -27,19 +23,11 @@ public class ItemViewModel extends ViewModel {
     }
 
     @MainThread
-    public SingleLiveEvent<DataItem> loadItem(String key) {
+    public LiveData<LiveDataEvent<Resource<DataItem>>> loadItem(String key) {
         if (dataItem == null) {
-            dataItem = new SingleLiveEvent<>();
-            repo.loadModel(key, new IFirebaseDatabaseRepository.DataItemCallback<DataItem>() {
-                @Override
-                public void onSuccess(DataItem item) {
-                    dataItem.setValue(item);
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    errorMessage.setValue(R.string.error_loading_item);
-                }
+            dataItem = new MediatorLiveData<>();
+            dataItem.addSource(repo.loadModel(key), res -> {
+                dataItem.setValue(new LiveDataEvent<>(res));
             });
         }
         return dataItem;

@@ -70,13 +70,17 @@ class AddEditItemFragment : BaseFragment() {
     private fun observeData() {
         if (itemKey != null) {
             viewModelItem.loadItem(itemKey).observe(this, Observer {
-                item = it!!
-                populateFields()
+                when (it?.contentIfNotHandled?.status?.status) {
+                    Status.SUCCESS -> {
+                        item = it.peekContent().data
+                        populateFields()
+                    }
+                    Status.ERROR -> {
+                        SnackbarUtils.showSnackbar(view, getString(R.string.error_loading_item))
+                    }
+                }
             })
         }
-        viewModelItem.errorMessage.observe(this, Observer {
-            SnackbarUtils.showSnackbar(view, getString(it!!))
-        })
         viewModelItems.saveItemEvent.observe(this, Observer {
             when (it?.getContentIfNotHandled(TAG)?.status?.status) {
                 Status.SUCCESS -> {

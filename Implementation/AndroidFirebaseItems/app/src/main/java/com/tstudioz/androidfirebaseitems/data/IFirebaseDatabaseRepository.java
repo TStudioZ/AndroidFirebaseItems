@@ -9,11 +9,13 @@ import java.util.List;
 public interface IFirebaseDatabaseRepository<Model> {
     void addListener(FirebaseDatabaseRepositoryCallback<Model> callback);
     void removeListener(FirebaseDatabaseRepositoryCallback<Model> callback);
-    void loadModel(String key, DataItemCallback<Model> callback);
+    LiveData<Resource<Model>> loadModel(String key);
     void save(Model model);
     void delete(Model model);
     LiveData<LiveDataEventWithTaggedObservers<Resource<Model>>> getSaveModelEvent();
     LiveData<LiveDataEventWithTaggedObservers<Resource<Model>>> getDeleteModelEvent();
+    LiveData<Resource<Model>> decreaseCount(Model model);
+    LiveData<Resource<Model>> increaseCount(Model model);
 
     interface FirebaseDatabaseRepositoryCallback<T> {
         void onSuccess(List<T> result);

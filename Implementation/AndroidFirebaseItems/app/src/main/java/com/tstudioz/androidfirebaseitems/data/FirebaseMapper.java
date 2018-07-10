@@ -22,7 +22,7 @@ public abstract class FirebaseMapper<Entity, Model> implements IMapper<Entity, M
     }
 
     @SuppressWarnings("unchecked")
-    private Class<Entity> getEntityClass() {
+    public Class<Entity> getEntityClass() {
         ParameterizedType superclass = (ParameterizedType) getClass().getGenericSuperclass();
         return (Class<Entity>) superclass.getActualTypeArguments()[0];
     }

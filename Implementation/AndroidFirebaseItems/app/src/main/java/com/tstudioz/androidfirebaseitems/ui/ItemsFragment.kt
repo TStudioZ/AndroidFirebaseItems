@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
@@ -145,6 +146,38 @@ class ItemsFragment : BaseFragment() {
                 }
             }
         })
+        viewModelItems.decreaseCountEvent.removeObservers(this)
+        viewModelItems.decreaseCountEvent.observe(this, Observer {
+            when (it?.peekContentIfNotHandled()?.status?.status) {
+                Status.SUCCESS -> {
+                    SnackbarUtils.showSnackbar(view, getString(R.string.count_decreased))
+                    it.handleContent()
+                }
+                Status.ERROR -> {
+                    SnackbarUtils.showSnackbar(view, getString(R.string.error_count_decrease))
+                    it.handleContent()
+                }
+                Status.WORKING -> {
+                    //SnackbarUtils.showSnackbar(view, getString(R.string.count_decreasing))
+                }
+            }
+        })
+        viewModelItems.increaseCountEvent.removeObservers(this)
+        viewModelItems.increaseCountEvent.observe(this, Observer {
+            when (it?.peekContentIfNotHandled()?.status?.status) {
+                Status.SUCCESS -> {
+                    SnackbarUtils.showSnackbar(view, getString(R.string.count_increased))
+                    it.handleContent()
+                }
+                Status.ERROR -> {
+                    SnackbarUtils.showSnackbar(view, getString(R.string.error_count_increase))
+                    it.handleContent()
+                }
+                Status.WORKING -> {
+                    //SnackbarUtils.showSnackbar(view, getString(R.string.count_increasing))
+                }
+            }
+        })
     }
 
     private fun setupAdapter(): RecyclerViewItemsAdapter<DataItem, DataItemViewHolder> {
@@ -156,11 +189,11 @@ class ItemsFragment : BaseFragment() {
             }
         }, object : RecyclerViewItemsAdapter.DiffCallback<DataItem> {
             override fun areItemsTheSame(item1: DataItem, item2: DataItem): Boolean {
-                return item1.name == item2.name
+                return item1.key == item2.key
             }
 
             override fun areContentsTheSame(item1: DataItem, item2: DataItem): Boolean {
-                return item1.name == item2.name
+                return item1.name == item2.name && item1.count == item2.count
             }
 
         }, object : RecyclerViewItemsAdapter.ViewHolderHandler<DataItem, DataItemViewHolder> {
@@ -174,13 +207,31 @@ class ItemsFragment : BaseFragment() {
 
             override fun bind(holder: DataItemViewHolder, item: DataItem) {
                 holder.nameView.text = item.name
+                holder.countView.text = item.count.toString()
+                holder.btnDecrease.setOnClickListener {
+                    decreaseCount(item)
+                }
+                holder.btnIncrease.setOnClickListener {
+                    increaseCount(item)
+                }
             }
 
         })
     }
 
+    private fun decreaseCount(item: DataItem) {
+        viewModelItems.decreaseCount(item)
+    }
+
+    private fun increaseCount(item: DataItem) {
+        viewModelItems.increaseCount(item)
+    }
+
     private class DataItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val nameView: TextView = view.findViewById(R.id.tvName)
+        val countView: TextView = view.findViewById(R.id.tvCount)
+        val btnDecrease: Button = view.findViewById(R.id.btnDecrease)
+        val btnIncrease: Button = view.findViewById(R.id.btnIncrease)
     }
 
     // TODO: Rename method, update argument and hook method into UI event

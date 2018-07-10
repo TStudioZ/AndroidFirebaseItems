@@ -16,9 +16,15 @@
     <string name="hint_item_count">Count</string>
     <string name="item_added">Item added</string>
     <string name="item_removed">Item removed</string>
+    <string name="count_decreasing">Decreasing count…</string>
+    <string name="count_increasing">Increasing count…</string>
+    <string name="count_decreased">Count decreased</string>
+    <string name="count_increased">Count increased</string>
     <string name="error_loading_item">Item could not be loaded</string>
     <string name="error_saving_item">Item could not be saved</string>
     <string name="error_removing_item">Item could not be removed</string>
+    <string name="error_count_decrease">Could not decrease count</string>
+    <string name="error_count_increase">Could not increase count</string>
     <string name="error_loading_user">User could not be loaded</string>
     <string name="error_registering_user">User could not be saved</string>
 </resources>
