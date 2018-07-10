@@ -5,6 +5,8 @@ import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -17,7 +19,7 @@ import java.util.Map;
 
 public abstract class FirebaseDatabaseRepository<Model, Entity> implements IFirebaseDatabaseRepository<Model> {
 
-    private final DatabaseReference dbReference;
+    protected final DatabaseReference dbReference;
     protected final FirebaseMapper<Entity, Model> mapper;
     private Map<FirebaseDatabaseRepositoryCallback<Model>, BaseValueEventListener<Model, Entity>> listenerMap;
 
@@ -36,6 +38,7 @@ public abstract class FirebaseDatabaseRepository<Model, Entity> implements IFire
 
     protected abstract String getRootNode();
     protected abstract String getModelsNode();
+    protected abstract String getEventsNode();
     protected abstract String getModelKey(Model model);
     protected abstract void setModelKey(Model model, String key);
     protected abstract Model cloneModel(Model model);
@@ -84,16 +87,29 @@ public abstract class FirebaseDatabaseRepository<Model, Entity> implements IFire
     }
 
     @Override
-    public void save(Model model) {
-        Entity entity = mapper.mapToSource(model);
+    public void save(Model modelOld, Model modelNew) {
+        Entity entity = mapper.mapToSource(modelNew);
         DatabaseReference ref;
-        String key = getModelKey(model);
+        String key = getModelKey(modelNew);
         if (key == null) {
             ref = dbReference.child(getModelsNode()).push();
+            ref.setValue(entity).addOnSuccessListener(aVoid -> {
+                saveSaveItemEvent(ref.getKey(), modelNew);
+                setModelKey(modelNew, ref.getKey());
+                saveModelEvent.setValue(new LiveDataEventWithTaggedObservers<>(Resource.success(modelNew)));
+            }).addOnFailureListener(e -> {
+                saveModelEvent.setValue(new LiveDataEventWithTaggedObservers<>(Resource.error(e, modelNew)));
+            });
         } else {
             ref = dbReference.child(getModelsNode()).child(key);
+            ref.setValue(entity).addOnSuccessListener(aVoid -> {
+                saveEditItemEvent(ref.getKey(), modelOld, modelNew);
+                setModelKey(modelNew, ref.getKey());
+                saveModelEvent.setValue(new LiveDataEventWithTaggedObservers<>(Resource.success(modelOld)));
+            }).addOnFailureListener(e -> {
+                saveModelEvent.setValue(new LiveDataEventWithTaggedObservers<>(Resource.error(e, modelOld)));
+            });
         }
-        listenForResult(ref, model, ref.setValue(entity), saveModelEvent);
     }
 
     @Override
@@ -102,7 +118,13 @@ public abstract class FirebaseDatabaseRepository<Model, Entity> implements IFire
         if (key == null) return;
 
         DatabaseReference ref = dbReference.child(getModelsNode()).child(key);
-        listenForResult(ref, model, ref.removeValue(), deleteModelEvent);
+        ref.removeValue().addOnSuccessListener(aVoid -> {
+            saveDeleteItemEvent(ref.getKey(), model);
+            setModelKey(model, ref.getKey());
+            saveModelEvent.setValue(new LiveDataEventWithTaggedObservers<>(Resource.success(model)));
+        }).addOnFailureListener(e -> {
+            saveModelEvent.setValue(new LiveDataEventWithTaggedObservers<>(Resource.error(e, model)));
+        });
     }
 
     @Override
@@ -133,8 +155,12 @@ public abstract class FirebaseDatabaseRepository<Model, Entity> implements IFire
                 res.setValue(Resource.error(e, null));
             }
         };
-
         DatabaseReference ref = dbReference.child(getModelsNode()).child(key);
+        if (increase) {
+            saveIncreaseCountEvent(ref.getKey(), model);
+        } else {
+            saveDecreaseCountEvent(ref.getKey(), model);
+        }
         updateCountImpl(increase, ref, model, callback);
         return res;
     }
@@ -149,5 +175,29 @@ public abstract class FirebaseDatabaseRepository<Model, Entity> implements IFire
         }).addOnFailureListener(e -> {
             event.setValue(new LiveDataEventWithTaggedObservers<>(Resource.error(e, model)));
         });
+    }
+
+    protected String EVENT_SAVE_ITEM = "eventSaveItem";
+    protected String EVENT_EDIT_ITEM = "eventEditItem";
+    protected String EVENT_DELETE_ITEM = "eventDeleteItem";
+    protected String EVENT_DECREASE_COUNT = "eventDecreaseCount";
+    protected String EVENT_INCREASE_COUNT = "eventIncreaseCount";
+
+    protected String getUserUID() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) return null;
+        return currentUser.getUid();
+    }
+
+    protected abstract void saveSaveItemEvent(String itemKey, Model model);
+    protected abstract void saveEditItemEvent(String itemKey, Model modelOld, Model modelNew);
+    protected abstract void saveDeleteItemEvent(String itemKey, Model model);
+    protected abstract void saveDecreaseCountEvent(String itemKey, Model model);
+    protected abstract void saveIncreaseCountEvent(String itemKey, Model model);
+
+    protected void saveEvent(String eventName, Map<String, Object> payload) {
+        FirebaseEventEntity event = new FirebaseEventEntity(eventName, getUserUID(), payload);
+        DatabaseReference ref = dbReference.child(getEventsNode()).push();
+        ref.setValue(event);
     }
 }

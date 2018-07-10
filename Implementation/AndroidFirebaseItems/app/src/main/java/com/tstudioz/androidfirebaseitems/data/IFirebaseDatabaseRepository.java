@@ -10,7 +10,7 @@ public interface IFirebaseDatabaseRepository<Model> {
     void addListener(FirebaseDatabaseRepositoryCallback<Model> callback);
     void removeListener(FirebaseDatabaseRepositoryCallback<Model> callback);
     LiveData<Resource<Model>> loadModel(String key);
-    void save(Model model);
+    void save(Model modelOld, Model modelNew);
     void delete(Model model);
     LiveData<LiveDataEventWithTaggedObservers<Resource<Model>>> getSaveModelEvent();
     LiveData<LiveDataEventWithTaggedObservers<Resource<Model>>> getDeleteModelEvent();

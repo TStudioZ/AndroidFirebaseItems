@@ -156,8 +156,8 @@ class AddEditItemFragment : BaseFragment() {
     private fun saveItem() {
         val name = nameInput.editText?.text.toString()
         val count = countInput.editText?.text.toString().toInt()
-        val item = DataItem(itemKey, name, count)
-        viewModelItems.saveItem(item)
+        val newItem = DataItem(itemKey, name, count)
+        viewModelItems.saveItem(item, newItem)
     }
 
     companion object {
