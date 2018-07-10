@@ -8,9 +8,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.v7.widget.RecyclerView
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Button
 import android.widget.TextView
 import com.firebase.ui.auth.AuthUI
@@ -19,6 +17,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.tstudioz.androidfirebaseitems.R
 import com.tstudioz.androidfirebaseitems.data.DataItem
+import com.tstudioz.androidfirebaseitems.data.FirebaseDatabaseUserRepository
 import com.tstudioz.androidfirebaseitems.data.Status
 import com.tstudioz.androidfirebaseitems.viewmodel.ItemsViewModel
 import com.tstudioz.androidfirebaseitems.viewmodel.UserViewModel
@@ -42,6 +41,13 @@ class ItemsFragment : BaseFragment() {
 
     private lateinit var viewModelUser: UserViewModel
     private lateinit var viewModelItems: ItemsViewModel
+
+    private var user: com.tstudioz.androidfirebaseitems.data.FirebaseUser? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -69,6 +75,23 @@ class ItemsFragment : BaseFragment() {
         } else {
             showLogin()
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+
+        if (canUserEdit())
+            inflater.inflate(R.menu.menu_main, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_add_item -> {
+                ActivityUtils.startActivity(activity, AddEditItemActivity::class.java)
+            }
+            else -> return super.onOptionsItemSelected(item)
+        }
+        return true
     }
 
     private fun checkLogin(): Boolean {
@@ -140,6 +163,8 @@ class ItemsFragment : BaseFragment() {
         viewModelUser.registerLoadUser(uid).observe(this, Observer {
             when (it?.peekContentIfNotHandled()?.status?.status) {
                 Status.SUCCESS -> {
+                    user = it.peekContent()?.data!!
+                    activity?.invalidateOptionsMenu()
                     observeData()
                 }
                 Status.ERROR -> {
@@ -217,9 +242,7 @@ class ItemsFragment : BaseFragment() {
     private fun setupAdapter(): RecyclerViewItemsAdapter<DataItem, DataItemViewHolder> {
         return RecyclerViewItemsAdapter(object : RecyclerViewItemsAdapter.OnItemRecyclerViewListener<DataItem> {
             override fun onItemSelected(item: DataItem) {
-                val extras = Bundle()
-                extras.putString(EXTRA_ITEM_KEY, item.key)
-                ActivityUtils.startActivity(activity, AddEditItemActivity::class.java, extras)
+                itemSelected(item)
             }
         }, object : RecyclerViewItemsAdapter.DiffCallback<DataItem> {
             override fun areItemsTheSame(item1: DataItem, item2: DataItem): Boolean {
@@ -249,6 +272,23 @@ class ItemsFragment : BaseFragment() {
                 }
             }
         })
+    }
+
+    private fun itemSelected(item: DataItem) {
+        if (!canUserEdit())
+            return
+
+        val extras = Bundle()
+        extras.putString(EXTRA_ITEM_KEY, item.key)
+        ActivityUtils.startActivity(activity, AddEditItemActivity::class.java, extras)
+    }
+
+    private fun canUserEdit(): Boolean {
+        if (user == null || user?.role == null
+                || !user?.role.equals(FirebaseDatabaseUserRepository.ROLE_EDITOR)) {
+            return false
+        }
+        return true
     }
 
     private fun decreaseCount(item: DataItem) {

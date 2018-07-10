@@ -14,6 +14,8 @@ import com.tstudioz.essentialuilibrary.viewmodel.LiveDataEventWithTaggedObserver
 
 public class FirebaseDatabaseUserRepository implements IFirebaseDatabaseUserRepository {
 
+    public static final String ROLE_BASIC = "basic";
+    public static final String ROLE_EDITOR = "editor";
     private final DatabaseReference dbReference;
     private final FirebaseMapper<FirebaseUserEntity, FirebaseUser> mapper;
 
@@ -39,7 +41,7 @@ public class FirebaseDatabaseUserRepository implements IFirebaseDatabaseUserRepo
     }
 
     private FirebaseUser createUser(String uid) {
-        return new FirebaseUser(uid, "basic");
+        return new FirebaseUser(uid, ROLE_BASIC);
     }
 
     @Override

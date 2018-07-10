@@ -98,7 +98,7 @@ public class DataItemRepository extends FirebaseDatabaseRepository<DataItem, Dat
 
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, boolean commited, @Nullable DataSnapshot dataSnapshot) {
-                Log.d("DataItemRepository", "Transaction decreaseCountImpl:onComplete" + databaseError);
+                Log.d("DataItemRepository", "Transaction decreaseCountImpl:onComplete, error: " + databaseError);
 
                 if (commited) {
                     callback.onSuccess(null);
