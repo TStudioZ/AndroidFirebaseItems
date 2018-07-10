@@ -101,7 +101,12 @@ public class DataItemRepository extends FirebaseDatabaseRepository<DataItem, Dat
                 Log.d("DataItemRepository", "Transaction decreaseCountImpl:onComplete, error: " + databaseError);
 
                 if (commited) {
-                    callback.onSuccess(null);
+                    DataItem updatedItem = null;
+                    if (dataSnapshot != null && dataSnapshot.exists()) {
+                        DataItemEntity updatedEntity = dataSnapshot.getValue(mapper.getEntityClass());
+                        updatedItem = mapper.mapToDestination(item.getKey(), updatedEntity);
+                    }
+                    callback.onSuccess(updatedItem);
                 } else {
                     callback.onError(databaseError != null ? databaseError.toException() : null);
                 }

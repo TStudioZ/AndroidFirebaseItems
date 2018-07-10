@@ -209,7 +209,11 @@ class ItemsFragment : BaseFragment() {
         viewModelItems.decreaseCountEvent.observe(this, Observer {
             when (it?.peekContentIfNotHandled()?.status?.status) {
                 Status.SUCCESS -> {
-                    SnackbarUtils.showSnackbar(view, getString(R.string.count_decreased))
+                    if (it.peekContent()?.data != null) {
+                        SnackbarUtils.showSnackbar(view, getString(R.string.count_decreased))
+                    } else {
+                        SnackbarUtils.showSnackbar(view, getString(R.string.item_removed))
+                    }
                     it.handleContent()
                 }
                 Status.ERROR -> {
