@@ -102,6 +102,11 @@ public class ItemsViewModel extends ViewModel {
     }
 
     @MainThread
+    public LiveData<LiveDataEventWithTaggedObservers<Resource<DataItem>>> getUpdateItemEvent() {
+        return repo.getUpdateModelEvent();
+    }
+
+    @MainThread
     public LiveData<LiveDataEventWithTaggedObservers<Resource<DataItem>>> getDeleteItemEvent() {
         return repo.getDeleteModelEvent();
     }
@@ -114,6 +119,11 @@ public class ItemsViewModel extends ViewModel {
     @MainThread
     public LiveData<LiveDataEvent<Resource<DataItem>>> getIncreaseCountEvent() {
         return increaseCountEvent;
+    }
+
+    @MainThread
+    public LiveData<Resource<Boolean>> isConnected() {
+        return repo.isConnected();
     }
 
     @Override

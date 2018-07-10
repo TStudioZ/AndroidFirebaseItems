@@ -15,6 +15,7 @@
     <string name="action_delete">Delete</string>
     <string name="hint_item_count">Count</string>
     <string name="item_added">Item added</string>
+    <string name="item_updated">Item updated</string>
     <string name="item_removed">Item removed</string>
     <string name="count_decreasing">Decreasing count…</string>
     <string name="count_increasing">Increasing count…</string>
@@ -27,4 +28,7 @@
     <string name="error_count_increase">Could not increase count</string>
     <string name="error_loading_user">User could not be loaded</string>
     <string name="error_registering_user">User could not be saved</string>
+    <string name="status_online">You are online</string>
+    <string name="status_offline">You are offline</string>
+    <string name="error_connecting">There is a problem with connection</string>
 </resources>

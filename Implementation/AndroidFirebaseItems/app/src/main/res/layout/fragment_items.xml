@@ -5,12 +5,28 @@
     android:layout_height="match_parent"
     tools:context=".ui.ItemsFragment">
 
-    <android.support.v7.widget.RecyclerView
-        android:visibility="visible"
-        android:id="@+id/itemList"
+    <LinearLayout android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        tools:listitem="@layout/data_item_row" />
+        android:layout_height="match_parent">
+
+        <TextView android:id="@+id/tvConnectionStatus"
+            android:visibility="gone"
+            android:text="@string/status_offline"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:background="@color/colorDanger"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:visibility="visible"
+            android:id="@+id/itemList"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            tools:listitem="@layout/data_item_row" />
+
+    </LinearLayout>
 
 </FrameLayout>

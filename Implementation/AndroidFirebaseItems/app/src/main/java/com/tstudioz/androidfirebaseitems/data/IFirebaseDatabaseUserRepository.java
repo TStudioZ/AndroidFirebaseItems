@@ -6,7 +6,7 @@ import com.tstudioz.essentialuilibrary.viewmodel.LiveDataEventWithTaggedObserver
 
 public interface IFirebaseDatabaseUserRepository {
 
-    void registerLoadUser(String uid, FirebaseUserCallback callback);
+    LiveData<Resource<FirebaseUser>> registerLoadUser(String uid);
     void save(FirebaseUser user);
     LiveData<LiveDataEventWithTaggedObservers<Resource<FirebaseUser>>> getSaveUserEvent();
 

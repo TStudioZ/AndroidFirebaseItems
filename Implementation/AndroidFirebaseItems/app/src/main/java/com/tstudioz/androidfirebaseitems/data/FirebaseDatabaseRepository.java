@@ -24,11 +24,17 @@ public abstract class FirebaseDatabaseRepository<Model, Entity> implements IFire
     private Map<FirebaseDatabaseRepositoryCallback<Model>, BaseValueEventListener<Model, Entity>> listenerMap;
 
     private MutableLiveData<LiveDataEventWithTaggedObservers<Resource<Model>>> saveModelEvent = new MutableLiveData<>();
+    private MutableLiveData<LiveDataEventWithTaggedObservers<Resource<Model>>> updateModelEvent = new MutableLiveData<>();
     private MutableLiveData<LiveDataEventWithTaggedObservers<Resource<Model>>> deleteModelEvent = new MutableLiveData<>();
 
     @Override
     public LiveData<LiveDataEventWithTaggedObservers<Resource<Model>>> getSaveModelEvent() {
         return saveModelEvent;
+    }
+
+    @Override
+    public MutableLiveData<LiveDataEventWithTaggedObservers<Resource<Model>>> getUpdateModelEvent() {
+        return updateModelEvent;
     }
 
     @Override
@@ -105,9 +111,9 @@ public abstract class FirebaseDatabaseRepository<Model, Entity> implements IFire
             ref.setValue(entity).addOnSuccessListener(aVoid -> {
                 saveEditItemEvent(ref.getKey(), modelOld, modelNew);
                 setModelKey(modelNew, ref.getKey());
-                saveModelEvent.setValue(new LiveDataEventWithTaggedObservers<>(Resource.success(modelOld)));
+                updateModelEvent.setValue(new LiveDataEventWithTaggedObservers<>(Resource.success(modelOld)));
             }).addOnFailureListener(e -> {
-                saveModelEvent.setValue(new LiveDataEventWithTaggedObservers<>(Resource.error(e, modelOld)));
+                updateModelEvent.setValue(new LiveDataEventWithTaggedObservers<>(Resource.error(e, modelOld)));
             });
         }
     }
@@ -121,9 +127,9 @@ public abstract class FirebaseDatabaseRepository<Model, Entity> implements IFire
         ref.removeValue().addOnSuccessListener(aVoid -> {
             saveDeleteItemEvent(ref.getKey(), model);
             setModelKey(model, ref.getKey());
-            saveModelEvent.setValue(new LiveDataEventWithTaggedObservers<>(Resource.success(model)));
+            deleteModelEvent.setValue(new LiveDataEventWithTaggedObservers<>(Resource.success(model)));
         }).addOnFailureListener(e -> {
-            saveModelEvent.setValue(new LiveDataEventWithTaggedObservers<>(Resource.error(e, model)));
+            deleteModelEvent.setValue(new LiveDataEventWithTaggedObservers<>(Resource.error(e, model)));
         });
     }
 
@@ -199,5 +205,27 @@ public abstract class FirebaseDatabaseRepository<Model, Entity> implements IFire
         FirebaseEventEntity event = new FirebaseEventEntity(eventName, getUserUID(), payload);
         DatabaseReference ref = dbReference.child(getEventsNode()).push();
         ref.setValue(event);
+    }
+
+    private MutableLiveData<Resource<Boolean>> connectedLiveData;
+    @Override
+    public LiveData<Resource<Boolean>> isConnected() {
+        if (connectedLiveData == null) {
+            connectedLiveData = new MutableLiveData<>();
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference(".info/connected");
+            ref.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    Boolean connected = dataSnapshot.getValue(Boolean.class);
+                    connectedLiveData.setValue(Resource.success(connected));
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    connectedLiveData.setValue(Resource.error(databaseError.toException(), null));
+                }
+            });
+        }
+        return connectedLiveData;
     }
 }

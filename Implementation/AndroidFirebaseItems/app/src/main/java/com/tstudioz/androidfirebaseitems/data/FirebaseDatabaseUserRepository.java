@@ -33,9 +33,9 @@ public class FirebaseDatabaseUserRepository implements IFirebaseDatabaseUserRepo
         this.mapper = new FirebaseUserMapper();
     }
 
-    private void onUserLoadSuccess(DataSnapshot dataSnapshot, String uid, FirebaseUserCallback callback) {
+    private void onUserLoadSuccess(DataSnapshot dataSnapshot, String uid, MutableLiveData<Resource<FirebaseUser>> res) {
         FirebaseUser user = mapper.map(uid, dataSnapshot);
-        callback.onSuccess(user);
+        res.setValue(Resource.success(user));
     }
 
     private FirebaseUser createUser(String uid) {
@@ -43,13 +43,16 @@ public class FirebaseDatabaseUserRepository implements IFirebaseDatabaseUserRepo
     }
 
     @Override
-    public void registerLoadUser(String uid, FirebaseUserCallback callback) {
+    public LiveData<Resource<FirebaseUser>> registerLoadUser(String uid) {
+        MutableLiveData<Resource<FirebaseUser>> res = new MutableLiveData<>();
+        res.setValue(Resource.working(null));
+
         DatabaseReference ref = dbReference.child(getUsersNode()).child(uid);
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    onUserLoadSuccess(dataSnapshot, uid, callback);
+                    onUserLoadSuccess(dataSnapshot, uid, res);
                 } else {
                     FirebaseUser user = createUser(uid);
                     FirebaseUserEntity userEntity = mapper.mapToSource(user);
@@ -57,22 +60,23 @@ public class FirebaseDatabaseUserRepository implements IFirebaseDatabaseUserRepo
                         ref.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                onUserLoadSuccess(dataSnapshot, uid, callback);
+                                onUserLoadSuccess(dataSnapshot, uid, res);
                             }
                             @Override
                             public void onCancelled(@NonNull DatabaseError databaseError) {
-                                callback.onRegisterError(databaseError.toException());
+                                res.setValue(Resource.error(databaseError.toException(), null));
                             }
                         });
-                    }).addOnFailureListener(callback::onRegisterError);
+                    }).addOnFailureListener(e -> res.setValue(Resource.error(e, null)));
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                callback.onLoadError(databaseError.toException());
+                res.setValue(Resource.error(databaseError.toException(), null));
             }
         });
+        return res;
     }
 
     @Override

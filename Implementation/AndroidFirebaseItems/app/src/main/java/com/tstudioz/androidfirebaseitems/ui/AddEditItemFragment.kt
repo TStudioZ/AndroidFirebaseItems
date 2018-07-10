@@ -91,6 +91,16 @@ class AddEditItemFragment : BaseFragment() {
                 }
             }
         })
+        viewModelItems.updateItemEvent.observe(this, Observer {
+            when (it?.getContentIfNotHandled(TAG)?.status?.status) {
+                Status.SUCCESS -> {
+                    activity?.finish()
+                }
+                Status.ERROR -> {
+                    SnackbarUtils.showSnackbar(view, getString(R.string.error_saving_item))
+                }
+            }
+        })
         viewModelItems.deleteItemEvent.observe(this, Observer {
             when (it?.getContentIfNotHandled(TAG)?.status?.status) {
                 Status.SUCCESS -> {
@@ -154,6 +164,11 @@ class AddEditItemFragment : BaseFragment() {
     }
 
     private fun saveItem() {
+        if (itemKey != null && item == null) {
+            // TODO: handle not loaded yet
+            return
+        }
+
         val name = nameInput.editText?.text.toString()
         val count = countInput.editText?.text.toString().toInt()
         val newItem = DataItem(itemKey, name, count)

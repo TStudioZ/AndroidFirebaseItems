@@ -27,6 +27,7 @@ import com.tstudioz.essentialuilibrary.ui.RecyclerViewItemsAdapter
 import com.tstudioz.essentialuilibrary.util.ActivityUtils
 import com.tstudioz.essentialuilibrary.util.FragmentUtils
 import com.tstudioz.essentialuilibrary.util.SnackbarUtils
+import kotlinx.android.synthetic.main.fragment_items.*
 import java.util.*
 
 private const val RC_SIGN_IN = 123
@@ -62,6 +63,7 @@ class ItemsFragment : BaseFragment() {
         viewModelItems = ViewModelProviders.of(this, viewModelFactory)
                 .get(ItemsViewModel::class.java)
 
+        observeStatus()
         if (checkLogin()) {
             observeUser(FirebaseAuth.getInstance().currentUser!!.uid)
         } else {
@@ -114,12 +116,36 @@ class ItemsFragment : BaseFragment() {
         }
     }
 
+    private fun observeStatus() {
+        viewModelItems.isConnected.observe(this, Observer {
+            when (it?.status?.status) {
+                Status.SUCCESS -> {
+                    if (!it.data!!) {
+                        tvConnectionStatus.setText(R.string.status_offline)
+                        tvConnectionStatus.visibility = View.VISIBLE
+                    } else {
+                        tvConnectionStatus.visibility = View.GONE
+                        //tvConnectionStatus.setText(R.string.status_online)
+                    }
+                }
+                Status.ERROR -> {
+                    tvConnectionStatus.visibility = View.GONE
+                    SnackbarUtils.showSnackbar(view, getString(R.string.error_connecting))
+                }
+            }
+        })
+    }
+
     private fun observeUser(uid: String) {
         viewModelUser.registerLoadUser(uid).observe(this, Observer {
-            observeData()
-        })
-        viewModelUser.errorMessage.observe(this, Observer {
-            SnackbarUtils.showSnackbar(view, getString(it!!))
+            when (it?.peekContentIfNotHandled()?.status?.status) {
+                Status.SUCCESS -> {
+                    observeData()
+                }
+                Status.ERROR -> {
+                    SnackbarUtils.showSnackbar(view, getString(R.string.error_loading_user))
+                }
+            }
         })
     }
 
@@ -135,6 +161,14 @@ class ItemsFragment : BaseFragment() {
             when (it?.getContentIfNotHandled(TAG)?.status?.status) {
                 Status.SUCCESS -> {
                     SnackbarUtils.showSnackbar(view, getString(R.string.item_added))
+                }
+            }
+        })
+        viewModelItems.updateItemEvent.removeObservers(this)
+        viewModelItems.updateItemEvent.observe(this, Observer {
+            when (it?.getContentIfNotHandled(TAG)?.status?.status) {
+                Status.SUCCESS -> {
+                    SnackbarUtils.showSnackbar(view, getString(R.string.item_updated))
                 }
             }
         })
@@ -195,7 +229,6 @@ class ItemsFragment : BaseFragment() {
             override fun areContentsTheSame(item1: DataItem, item2: DataItem): Boolean {
                 return item1.name == item2.name && item1.count == item2.count
             }
-
         }, object : RecyclerViewItemsAdapter.ViewHolderHandler<DataItem, DataItemViewHolder> {
             override fun getLayoutId(viewType: Int): Int {
                 return R.layout.data_item_row
@@ -215,7 +248,6 @@ class ItemsFragment : BaseFragment() {
                     increaseCount(item)
                 }
             }
-
         })
     }
 

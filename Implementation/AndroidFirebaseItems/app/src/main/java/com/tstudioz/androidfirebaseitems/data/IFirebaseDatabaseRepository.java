@@ -13,9 +13,12 @@ public interface IFirebaseDatabaseRepository<Model> {
     void save(Model modelOld, Model modelNew);
     void delete(Model model);
     LiveData<LiveDataEventWithTaggedObservers<Resource<Model>>> getSaveModelEvent();
+    LiveData<LiveDataEventWithTaggedObservers<Resource<Model>>> getUpdateModelEvent();
     LiveData<LiveDataEventWithTaggedObservers<Resource<Model>>> getDeleteModelEvent();
     LiveData<Resource<Model>> decreaseCount(Model model);
     LiveData<Resource<Model>> increaseCount(Model model);
+
+    LiveData<Resource<Boolean>> isConnected();
 
     interface FirebaseDatabaseRepositoryCallback<T> {
         void onSuccess(List<T> result);
