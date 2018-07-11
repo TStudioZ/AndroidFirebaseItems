@@ -25,6 +25,7 @@
 
     <LinearLayout android:id="@+id/viewCountControls"
         android:orientation="horizontal"
+        android:gravity="center_vertical"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -35,10 +36,14 @@
         <Button android:text="-"
             android:id="@+id/btnDecrease"
             style="@style/ButtonSmall"
+            android:background="@drawable/circle_button_red_selector"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/component_medium_horizontal_margin"
-            android:textAppearance="@style/TextViewLarge"/>
+            android:textColor="@android:color/white"
+            android:textAppearance="@style/TextViewLarge"
+            android:textStyle="bold"
+            android:textSize="@dimen/text_button_large"/>
 
         <TextView android:text="1"
             android:id="@+id/tvCount"
@@ -50,10 +55,14 @@
         <Button android:text="+"
             android:id="@+id/btnIncrease"
             style="@style/ButtonSmall"
+            android:background="@drawable/circle_button_green_selector"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/component_medium_horizontal_margin"
-            android:textAppearance="@style/TextViewLarge"/>
+            android:textColor="@android:color/white"
+            android:textAppearance="@style/TextViewLarge"
+            android:textStyle="bold"
+            android:textSize="@dimen/text_button_large"/>
 
     </LinearLayout>
 

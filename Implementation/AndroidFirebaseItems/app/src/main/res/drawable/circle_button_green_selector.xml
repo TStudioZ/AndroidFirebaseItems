@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- disable state. -->
+    <item android:state_enabled="false"
+        android:drawable="@drawable/circle_button_green_disabled" />
+
+    <!--released state. -->
+    <item android:state_pressed="false"
+        android:drawable="@drawable/circle_button_green_released" />
+
+    <!--pressed state. -->
+    <item android:state_pressed="true"
+        android:drawable="@drawable/circle_button_green_pressed" />
+
+</selector>
