@@ -1,9 +1,11 @@
 <resources>
-    <string name="app_name">Firebase Items</string>
+    <string name="app_name">Le Réfrigérateur</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
     <string name="hint_item_name">Item name</string>
+    <string name="label_add_item">Add item</string>
+    <string name="label_update_item">Update item</string>
     <string name="error_name_required">Name is required.</string>
     <string name="error_name_length">Wrong length.</string>
     <string name="error_name_format">Wrong format.</string>
@@ -17,6 +19,7 @@
     <string name="item_added">Item added</string>
     <string name="item_updated">Item updated</string>
     <string name="item_removed">Item removed</string>
+    <string name="item_consumed">Item consumed</string>
     <string name="count_decreasing">Decreasing count…</string>
     <string name="count_increasing">Increasing count…</string>
     <string name="count_decreased">Count decreased</string>

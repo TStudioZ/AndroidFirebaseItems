@@ -212,7 +212,7 @@ class ItemsFragment : BaseFragment() {
                     if (it.peekContent()?.data != null) {
                         SnackbarUtils.showSnackbar(view, getString(R.string.count_decreased))
                     } else {
-                        SnackbarUtils.showSnackbar(view, getString(R.string.item_removed))
+                        SnackbarUtils.showSnackbar(view, getString(R.string.item_consumed))
                     }
                     it.handleContent()
                 }

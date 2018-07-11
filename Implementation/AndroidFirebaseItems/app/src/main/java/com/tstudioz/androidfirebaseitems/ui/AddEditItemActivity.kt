@@ -18,6 +18,12 @@ class AddEditItemActivity : BaseActivity() {
             itemKey = intent.getStringExtra(EXTRA_ITEM_KEY)
         }
 
+        if (itemKey == null) {
+            setTitle(R.string.action_add_item)
+        } else {
+            setTitle(R.string.label_update_item)
+        }
+
         if (savedInstanceState == null) {
             ActivityUtils.replaceFragmentInActivity(
                     supportFragmentManager,
