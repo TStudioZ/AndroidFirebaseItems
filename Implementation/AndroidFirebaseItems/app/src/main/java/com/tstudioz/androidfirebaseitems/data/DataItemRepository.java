@@ -8,6 +8,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.Transaction;
 
@@ -64,6 +65,11 @@ public class DataItemRepository extends FirebaseDatabaseRepository<DataItem, Dat
     @Override
     protected DataItem cloneModel(DataItem item) {
         return new DataItem(item.getKey(), item.getName(), item.getCount());
+    }
+
+    @Override
+    protected Query createItemsQuery(DatabaseReference ref) {
+        return ref.orderByChild(NAME);
     }
 
     @Override

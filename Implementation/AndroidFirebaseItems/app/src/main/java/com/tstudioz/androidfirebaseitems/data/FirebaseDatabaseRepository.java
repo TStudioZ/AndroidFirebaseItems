@@ -11,6 +11,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.tstudioz.essentialuilibrary.viewmodel.LiveDataEventWithTaggedObservers;
 
@@ -21,6 +22,7 @@ public abstract class FirebaseDatabaseRepository<Model, Entity> implements IFire
 
     protected final DatabaseReference dbReference;
     protected final FirebaseMapper<Entity, Model> mapper;
+    private final Query itemsQuery;
     private Map<FirebaseDatabaseRepositoryCallback<Model>, BaseValueEventListener<Model, Entity>> listenerMap;
 
     private MutableLiveData<LiveDataEventWithTaggedObservers<Resource<Model>>> saveModelEvent = new MutableLiveData<>();
@@ -49,10 +51,12 @@ public abstract class FirebaseDatabaseRepository<Model, Entity> implements IFire
     protected abstract void setModelKey(Model model, String key);
     protected abstract Model cloneModel(Model model);
     protected abstract void updateCountImpl(boolean increase, DatabaseReference ref, Model model, DataItemCallback<Model> callback);
+    protected abstract Query createItemsQuery(DatabaseReference ref);
 
     public FirebaseDatabaseRepository(FirebaseMapper<Entity, Model> mapper) {
         this.dbReference = FirebaseDatabase.getInstance().getReference();
         this.mapper = mapper;
+        this.itemsQuery = createItemsQuery(dbReference.child(getModelsNode()));
         this.listenerMap = new HashMap<>();
     }
 
@@ -60,14 +64,14 @@ public abstract class FirebaseDatabaseRepository<Model, Entity> implements IFire
     public void addListener(FirebaseDatabaseRepositoryCallback<Model> callback) {
         BaseValueEventListener<Model, Entity> listener = new BaseValueEventListener<>(mapper, callback);
         listenerMap.put(callback, listener);
-        dbReference.child(getModelsNode()).addValueEventListener(listener);
+        itemsQuery.addValueEventListener(listener);
     }
 
     @Override
     public void removeListener(FirebaseDatabaseRepositoryCallback<Model> callback) {
         if (listenerMap.containsKey(callback)) {
             BaseValueEventListener<Model, Entity> listener = listenerMap.remove(callback);
-            dbReference.child(getModelsNode()).removeEventListener(listener);
+            itemsQuery.removeEventListener(listener);
         }
     }
 
