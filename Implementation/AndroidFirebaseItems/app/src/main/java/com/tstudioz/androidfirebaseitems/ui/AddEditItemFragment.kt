@@ -14,7 +14,6 @@ import com.tstudioz.androidfirebaseitems.viewmodel.ItemViewModel
 import com.tstudioz.androidfirebaseitems.viewmodel.ItemsViewModel
 import com.tstudioz.essentialuilibrary.ui.BaseFragment
 import com.tstudioz.essentialuilibrary.util.SnackbarUtils
-import kotlinx.android.synthetic.main.fragment_add_edit_item.*
 
 private const val ARG_ITEM_KEY = "itemKey"
 
@@ -150,7 +149,7 @@ class AddEditItemFragment : BaseFragment() {
         if (!nameInput.validate()) {
             flag = false
         }
-        if (!inputItemCount.validate()) {
+        if (!countInput.validate()) {
             flag = false
         }
         return flag
