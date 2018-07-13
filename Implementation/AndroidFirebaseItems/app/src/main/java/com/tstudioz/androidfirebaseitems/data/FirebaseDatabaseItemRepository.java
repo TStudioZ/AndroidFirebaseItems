@@ -18,12 +18,12 @@ import com.tstudioz.essentialuilibrary.viewmodel.LiveDataEventWithTaggedObserver
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class FirebaseDatabaseRepository<Model, Entity> implements IFirebaseDatabaseRepository<Model> {
+public abstract class FirebaseDatabaseItemRepository<Model, Entity> implements IFirebaseDatabaseItemRepository<Model> {
 
     protected final DatabaseReference dbReference;
-    protected final FirebaseMapper<Entity, Model> mapper;
+    protected final FirebaseItemMapper<Entity, Model> mapper;
     private final Query itemsQuery;
-    private Map<FirebaseDatabaseRepositoryCallback<Model>, BaseValueEventListener<Model, Entity>> listenerMap;
+    private Map<FirebaseDatabaseRepositoryCallback<Model>, ListBaseValueEventListener<Model, Entity>> listenerMap;
 
     private MutableLiveData<LiveDataEventWithTaggedObservers<Resource<Model>>> saveModelEvent = new MutableLiveData<>();
     private MutableLiveData<LiveDataEventWithTaggedObservers<Resource<Model>>> updateModelEvent = new MutableLiveData<>();
@@ -44,7 +44,6 @@ public abstract class FirebaseDatabaseRepository<Model, Entity> implements IFire
         return deleteModelEvent;
     }
 
-    protected abstract String getRootNode();
     protected abstract String getModelsNode();
     protected abstract String getEventsNode();
     protected abstract String getModelKey(Model model);
@@ -53,7 +52,7 @@ public abstract class FirebaseDatabaseRepository<Model, Entity> implements IFire
     protected abstract void updateCountImpl(boolean increase, DatabaseReference ref, Model model, DataItemCallback<Model> callback);
     protected abstract Query createItemsQuery(DatabaseReference ref);
 
-    public FirebaseDatabaseRepository(FirebaseMapper<Entity, Model> mapper) {
+    public FirebaseDatabaseItemRepository(FirebaseItemMapper<Entity, Model> mapper) {
         this.dbReference = FirebaseDatabase.getInstance().getReference();
         this.mapper = mapper;
         this.itemsQuery = createItemsQuery(dbReference.child(getModelsNode()));
@@ -61,16 +60,16 @@ public abstract class FirebaseDatabaseRepository<Model, Entity> implements IFire
     }
 
     @Override
-    public void addListener(FirebaseDatabaseRepositoryCallback<Model> callback) {
-        BaseValueEventListener<Model, Entity> listener = new BaseValueEventListener<>(mapper, callback);
+    public void addItemListListener(FirebaseDatabaseRepositoryCallback<Model> callback) {
+        ListBaseValueEventListener<Model, Entity> listener = new ListBaseValueEventListener<>(mapper, callback);
         listenerMap.put(callback, listener);
         itemsQuery.addValueEventListener(listener);
     }
 
     @Override
-    public void removeListener(FirebaseDatabaseRepositoryCallback<Model> callback) {
+    public void removeItemListener(FirebaseDatabaseRepositoryCallback<Model> callback) {
         if (listenerMap.containsKey(callback)) {
-            BaseValueEventListener<Model, Entity> listener = listenerMap.remove(callback);
+            ListBaseValueEventListener<Model, Entity> listener = listenerMap.remove(callback);
             itemsQuery.removeEventListener(listener);
         }
     }

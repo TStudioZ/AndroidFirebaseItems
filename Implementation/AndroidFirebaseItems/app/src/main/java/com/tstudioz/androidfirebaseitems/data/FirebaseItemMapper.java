@@ -6,7 +6,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class FirebaseMapper<Entity, Model> implements IMapper<Entity, Model> {
+public abstract class FirebaseItemMapper<Entity, Model> implements IMapper<Entity, Model> {
 
     public Model map(String key, DataSnapshot dataSnapshot) {
         Entity entity = dataSnapshot.getValue(getEntityClass());

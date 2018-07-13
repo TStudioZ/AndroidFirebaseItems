@@ -8,13 +8,13 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
-public class BaseValueEventListener<Model, Entity> implements ValueEventListener {
+public class ListBaseValueEventListener<Model, Entity> implements ValueEventListener {
 
-    private final FirebaseMapper<Entity, Model> mapper;
-    private final FirebaseDatabaseRepository.FirebaseDatabaseRepositoryCallback<Model> callback;
+    private final FirebaseItemMapper<Entity, Model> mapper;
+    private final FirebaseDatabaseItemRepository.FirebaseDatabaseRepositoryCallback<Model> callback;
 
-    public BaseValueEventListener(FirebaseMapper<Entity, Model> mapper,
-                                  FirebaseDatabaseRepository.FirebaseDatabaseRepositoryCallback<Model> callback) {
+    public ListBaseValueEventListener(FirebaseItemMapper<Entity, Model> mapper,
+                                      FirebaseDatabaseItemRepository.FirebaseDatabaseRepositoryCallback<Model> callback) {
         this.mapper = mapper;
         this.callback = callback;
     }

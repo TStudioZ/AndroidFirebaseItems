@@ -18,7 +18,7 @@ import java.util.Map;
 import javax.inject.Singleton;
 
 @Singleton
-public class DataItemRepository extends FirebaseDatabaseRepository<DataItem, DataItemEntity> {
+public class DataItemRepository extends FirebaseDatabaseItemRepository<DataItem, DataItemEntity> {
 
     private static final int MAX_ITEM_COUNT = 999;
     private static final String ITEM_KEY = "itemKey";
@@ -35,11 +35,6 @@ public class DataItemRepository extends FirebaseDatabaseRepository<DataItem, Dat
 
     public DataItemRepository() {
         super(new DataItemMapper());
-    }
-
-    @Override
-    protected String getRootNode() {
-        return "items";
     }
 
     @Override

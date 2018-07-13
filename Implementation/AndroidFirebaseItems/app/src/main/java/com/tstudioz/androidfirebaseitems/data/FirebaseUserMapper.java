@@ -1,6 +1,6 @@
 package com.tstudioz.androidfirebaseitems.data;
 
-public class FirebaseUserMapper extends FirebaseMapper<FirebaseUserEntity, FirebaseUser> {
+public class FirebaseUserMapper extends FirebaseItemMapper<FirebaseUserEntity, FirebaseUser> {
 
     @Override
     public FirebaseUserEntity mapToSource(FirebaseUser firebaseUser) {

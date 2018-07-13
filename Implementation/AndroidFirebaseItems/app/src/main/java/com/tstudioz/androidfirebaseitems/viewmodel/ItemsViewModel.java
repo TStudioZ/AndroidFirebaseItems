@@ -9,11 +9,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.tstudioz.androidfirebaseitems.data.DataItem;
-import com.tstudioz.androidfirebaseitems.data.IFirebaseDatabaseRepository;
+import com.tstudioz.androidfirebaseitems.data.IFirebaseDatabaseItemRepository;
 import com.tstudioz.androidfirebaseitems.data.Resource;
 import com.tstudioz.essentialuilibrary.viewmodel.LiveDataEvent;
 import com.tstudioz.essentialuilibrary.viewmodel.LiveDataEventWithTaggedObservers;
-import com.tstudioz.essentialuilibrary.viewmodel.SnackbarMessage;
 
 import java.util.List;
 
@@ -21,25 +20,17 @@ import javax.inject.Inject;
 
 public class ItemsViewModel extends ViewModel {
 
-    private IFirebaseDatabaseRepository<DataItem> repo;
+    private IFirebaseDatabaseItemRepository<DataItem> repo;
 
     private MutableLiveData<List<DataItem>> items;
-    private IFirebaseDatabaseRepository.FirebaseDatabaseRepositoryCallback<DataItem> callback;
-    private MediatorLiveData<LiveDataEvent<Resource<DataItem>>> saveItemSingleEvent;
-    private MediatorLiveData<LiveDataEvent<Resource<DataItem>>> deleteItemSingleEvent;
+    private IFirebaseDatabaseItemRepository.FirebaseDatabaseRepositoryCallback<DataItem> callback;
     private MediatorLiveData<LiveDataEvent<Resource<DataItem>>> decreaseCountEvent = new MediatorLiveData<>();
     private MediatorLiveData<LiveDataEvent<Resource<DataItem>>> increaseCountEvent = new MediatorLiveData<>();
 
-    private SnackbarMessage itemAddedMessage = new SnackbarMessage();
-
-    public SnackbarMessage getItemAddedMessage() {
-        return itemAddedMessage;
-    }
-
     @Inject
-    public ItemsViewModel(final IFirebaseDatabaseRepository<DataItem> repo) {
+    public ItemsViewModel(final IFirebaseDatabaseItemRepository<DataItem> repo) {
         this.repo = repo;
-        this.callback = new IFirebaseDatabaseRepository.FirebaseDatabaseRepositoryCallback<DataItem>() {
+        this.callback = new IFirebaseDatabaseItemRepository.FirebaseDatabaseRepositoryCallback<DataItem>() {
             @Override
             public void onSuccess(List<DataItem> result) {
                 items.setValue(result);
@@ -63,7 +54,7 @@ public class ItemsViewModel extends ViewModel {
 
     @MainThread
     private void loadItems() {
-        repo.addListener(callback);
+        repo.addItemListListener(callback);
     }
 
     @MainThread
@@ -129,6 +120,6 @@ public class ItemsViewModel extends ViewModel {
     @Override
     protected void onCleared() {
         super.onCleared();
-        repo.removeListener(callback);
+        repo.removeItemListener(callback);
     }
 }

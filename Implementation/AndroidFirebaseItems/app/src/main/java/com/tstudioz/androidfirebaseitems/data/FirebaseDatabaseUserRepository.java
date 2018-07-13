@@ -17,7 +17,7 @@ public class FirebaseDatabaseUserRepository implements IFirebaseDatabaseUserRepo
     public static final String ROLE_BASIC = "basic";
     public static final String ROLE_EDITOR = "editor";
     private final DatabaseReference dbReference;
-    private final FirebaseMapper<FirebaseUserEntity, FirebaseUser> mapper;
+    private final FirebaseItemMapper<FirebaseUserEntity, FirebaseUser> mapper;
 
     private String getUsersNode() {
         return "users";

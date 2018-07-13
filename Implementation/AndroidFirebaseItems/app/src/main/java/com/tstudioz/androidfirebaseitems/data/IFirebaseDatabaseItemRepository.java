@@ -6,9 +6,9 @@ import com.tstudioz.essentialuilibrary.viewmodel.LiveDataEventWithTaggedObserver
 
 import java.util.List;
 
-public interface IFirebaseDatabaseRepository<Model> {
-    void addListener(FirebaseDatabaseRepositoryCallback<Model> callback);
-    void removeListener(FirebaseDatabaseRepositoryCallback<Model> callback);
+public interface IFirebaseDatabaseItemRepository<Model> {
+    void addItemListListener(FirebaseDatabaseRepositoryCallback<Model> callback);
+    void removeItemListener(FirebaseDatabaseRepositoryCallback<Model> callback);
     LiveData<Resource<Model>> loadModel(String key);
     void save(Model modelOld, Model modelNew);
     void delete(Model model);

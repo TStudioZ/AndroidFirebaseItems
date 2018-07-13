@@ -6,7 +6,7 @@ import android.arch.lifecycle.ViewModel;
 import android.support.annotation.MainThread;
 
 import com.tstudioz.androidfirebaseitems.data.DataItem;
-import com.tstudioz.androidfirebaseitems.data.IFirebaseDatabaseRepository;
+import com.tstudioz.androidfirebaseitems.data.IFirebaseDatabaseItemRepository;
 import com.tstudioz.androidfirebaseitems.data.Resource;
 import com.tstudioz.essentialuilibrary.viewmodel.LiveDataEvent;
 
@@ -14,11 +14,11 @@ import javax.inject.Inject;
 
 public class ItemViewModel extends ViewModel {
 
-    private IFirebaseDatabaseRepository<DataItem> repo;
+    private IFirebaseDatabaseItemRepository<DataItem> repo;
     private MediatorLiveData<LiveDataEvent<Resource<DataItem>>> dataItem;
 
     @Inject
-    public ItemViewModel(final IFirebaseDatabaseRepository<DataItem> repo) {
+    public ItemViewModel(final IFirebaseDatabaseItemRepository<DataItem> repo) {
         this.repo = repo;
     }
 

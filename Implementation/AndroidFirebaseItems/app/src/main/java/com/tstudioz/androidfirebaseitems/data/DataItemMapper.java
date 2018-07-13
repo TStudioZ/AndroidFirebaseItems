@@ -1,6 +1,6 @@
 package com.tstudioz.androidfirebaseitems.data;
 
-public class DataItemMapper extends FirebaseMapper<DataItemEntity, DataItem> {
+public class DataItemMapper extends FirebaseItemMapper<DataItemEntity, DataItem> {
 
     @Override
     public DataItemEntity mapToSource(DataItem dataItem) {
