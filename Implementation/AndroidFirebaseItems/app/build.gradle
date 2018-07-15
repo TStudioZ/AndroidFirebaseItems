@@ -43,8 +43,11 @@ dependencies {
     androidTestImplementation "com.android.support.test:runner:$rootProject.testRunnerVersion"
     androidTestImplementation "com.android.support.test.espresso:espresso-core:$rootProject.espressoVersion"
     implementation "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
+    androidTestImplementation "android.arch.core:core-testing:$archComponentsVersion"
     implementation "android.arch.lifecycle:livedata:$archComponentsVersion"
     implementation "android.arch.lifecycle:extensions:$archComponentsVersion"
+    testImplementation 'org.mockito:mockito-core:2.19.1'
+    androidTestImplementation 'org.mockito:mockito-android:2.19.1'
     // Dagger
     implementation "com.google.dagger:dagger-android:$rootProject.daggerVersion"
     implementation "com.google.dagger:dagger-android-support:$rootProject.daggerVersion"
