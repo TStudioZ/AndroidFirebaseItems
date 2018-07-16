@@ -1,8 +1,19 @@
 <resources>
 
-    <style name="AppTheme" parent="Theme.AppCompat.Light" >
+<style name="AppTheme" parent="Theme.AppCompat.Light" >
         <item name="colorPrimaryDark">@color/primaryDarkColor</item>
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorAccent">@color/primaryLightColor</item>
+
+        <!-- enable window content transitions -->
+        <item name="android:windowActivityTransitions">true</item>
+
+        <!-- specify enter and exit transitions -->
+        <item name="android:windowEnterTransition">@android:transition/explode</item>
+        <item name="android:windowExitTransition">@android:transition/explode</item>
+
+        <!-- specify shared element transitions -->
+        <item name="android:windowSharedElementEnterTransition">@transition/item_shared_transform</item>
+        <item name="android:windowSharedElementExitTransition">@transition/item_shared_transform</item>
     </style>
 </resources>

@@ -7,6 +7,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.support.v4.app.ActivityOptionsCompat
+import android.support.v4.util.Pair
 import android.support.v7.widget.RecyclerView
 import android.view.*
 import android.widget.Button
@@ -87,7 +89,7 @@ class ItemsFragment : BaseFragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_add_item -> {
-                ActivityUtils.startActivity(activity, AddEditItemActivity::class.java)
+                addItem()
             }
             else -> return super.onOptionsItemSelected(item)
         }
@@ -244,9 +246,9 @@ class ItemsFragment : BaseFragment() {
     }
 
     private fun setupAdapter(): RecyclerViewItemsAdapter<DataItem, DataItemViewHolder> {
-        return RecyclerViewItemsAdapter(object : RecyclerViewItemsAdapter.OnItemRecyclerViewListener<DataItem> {
-            override fun onItemSelected(item: DataItem) {
-                itemSelected(item)
+        return RecyclerViewItemsAdapter(object : RecyclerViewItemsAdapter.OnItemRecyclerViewListener<DataItem, DataItemViewHolder> {
+            override fun onItemSelected(item: DataItem, holder: DataItemViewHolder) {
+                itemSelected(item, holder)
             }
         }, object : RecyclerViewItemsAdapter.DiffCallback<DataItem> {
             override fun areItemsTheSame(item1: DataItem, item2: DataItem): Boolean {
@@ -278,13 +280,22 @@ class ItemsFragment : BaseFragment() {
         })
     }
 
-    private fun itemSelected(item: DataItem) {
+    private fun addItem() {
+        ActivityUtils.startActivity(activity, AddEditItemActivity::class.java)
+    }
+
+    private fun itemSelected(item: DataItem, holder: DataItemViewHolder) {
         if (!canUserEdit())
             return
 
         val extras = Bundle()
         extras.putString(EXTRA_ITEM_KEY, item.key)
-        ActivityUtils.startActivity(activity, AddEditItemActivity::class.java, extras)
+
+        val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                activity!!,
+                Pair<View, String>(holder.nameView, VIEW_NAME_ITEM_NAME),
+                Pair<View, String>(holder.countView, VIEW_NAME_ITEM_COUNT))
+        ActivityUtils.startActivityWithOptions(activity, AddEditItemActivity::class.java, options, extras)
     }
 
     private fun canUserEdit(): Boolean {

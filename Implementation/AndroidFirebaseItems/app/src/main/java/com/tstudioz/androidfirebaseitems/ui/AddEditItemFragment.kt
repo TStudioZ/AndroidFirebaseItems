@@ -4,9 +4,8 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.view.ViewCompat
 import android.view.*
-import android.widget.TextView
-import com.julianraj.validatedtextinputlayout.ValidatedTextInputLayout
 import com.tstudioz.androidfirebaseitems.R
 import com.tstudioz.androidfirebaseitems.data.DataItem
 import com.tstudioz.androidfirebaseitems.data.Status
@@ -14,6 +13,7 @@ import com.tstudioz.androidfirebaseitems.viewmodel.ItemViewModel
 import com.tstudioz.androidfirebaseitems.viewmodel.ItemsViewModel
 import com.tstudioz.essentialuilibrary.ui.BaseFragment
 import com.tstudioz.essentialuilibrary.util.SnackbarUtils
+import kotlinx.android.synthetic.main.fragment_add_edit_item.*
 
 private const val ARG_ITEM_KEY = "itemKey"
 
@@ -22,9 +22,6 @@ private const val ARG_ITEM_KEY = "itemKey"
  *
  */
 class AddEditItemFragment : BaseFragment() {
-
-    private lateinit var nameInput: ValidatedTextInputLayout
-    private lateinit var countInput: ValidatedTextInputLayout
 
     private lateinit var viewModelItem: ItemViewModel
     private lateinit var viewModelItems: ItemsViewModel
@@ -45,14 +42,15 @@ class AddEditItemFragment : BaseFragment() {
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_add_edit_item, container, false)
 
-        nameInput = view.findViewById(R.id.inputItemName)
-        countInput = view.findViewById(R.id.inputItemCount)
-
-        TextView(activity).apply {
-            setText(R.string.hello_blank_fragment)
-        }
-
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        ViewCompat.setTransitionName(inputItemName, VIEW_NAME_ITEM_NAME)
+        ViewCompat.setTransitionName(inputItemCount, VIEW_NAME_ITEM_COUNT)
+        activity?.startPostponedEnterTransition()
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -133,8 +131,8 @@ class AddEditItemFragment : BaseFragment() {
 
     private fun populateFields() {
         item?.run {
-            nameInput.editText?.setText(name)
-            countInput.editText?.setText(count.toString())
+            inputItemName.editText?.setText(name)
+            inputItemCount.editText?.setText(count.toString())
         }
     }
 
@@ -146,10 +144,10 @@ class AddEditItemFragment : BaseFragment() {
 
     private fun validateFields(): Boolean {
         var flag = true
-        if (!nameInput.validate()) {
+        if (!inputItemName.validate()) {
             flag = false
         }
-        if (!countInput.validate()) {
+        if (!inputItemCount.validate()) {
             flag = false
         }
         return flag
@@ -167,8 +165,8 @@ class AddEditItemFragment : BaseFragment() {
             return
         }
 
-        val name = nameInput.editText?.text.toString()
-        val count = countInput.editText?.text.toString().toInt()
+        val name = inputItemName.editText?.text.toString()
+        val count = inputItemCount.editText?.text.toString().toInt()
         val newItem = DataItem(itemKey, name, count)
         viewModelItems.saveItem(item, newItem)
     }
