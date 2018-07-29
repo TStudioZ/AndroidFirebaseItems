@@ -1,15 +1,18 @@
-package com.tstudioz.androidfirebaseitems.data;
+package com.tstudioz.androidfirebaseitems.domain.repository;
 
 import android.arch.lifecycle.LiveData;
 
+import com.tstudioz.androidfirebaseitems.domain.Resource;
 import com.tstudioz.essentialuilibrary.viewmodel.LiveDataEventWithTaggedObservers;
 
 import java.util.List;
 
+import io.reactivex.Observable;
+import io.reactivex.Single;
+
 public interface IFirebaseDatabaseItemRepository<Model> {
-    void addItemListListener(FirebaseDatabaseRepositoryCallback<Model> callback);
-    void removeItemListener(FirebaseDatabaseRepositoryCallback<Model> callback);
-    LiveData<Resource<Model>> loadModel(String key);
+    Observable<List<Model>> loadItems();
+    Single<Model> loadModel(String key);
     void save(Model modelOld, Model modelNew);
     void delete(Model model);
     LiveData<LiveDataEventWithTaggedObservers<Resource<Model>>> getSaveModelEvent();

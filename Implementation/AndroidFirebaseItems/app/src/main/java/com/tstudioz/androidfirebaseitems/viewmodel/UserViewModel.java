@@ -5,9 +5,9 @@ import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.support.annotation.MainThread;
 
-import com.tstudioz.androidfirebaseitems.data.FirebaseUser;
-import com.tstudioz.androidfirebaseitems.data.IFirebaseDatabaseUserRepository;
-import com.tstudioz.androidfirebaseitems.data.Resource;
+import com.tstudioz.androidfirebaseitems.domain.model.FirebaseUser;
+import com.tstudioz.androidfirebaseitems.domain.repository.IFirebaseDatabaseUserRepository;
+import com.tstudioz.androidfirebaseitems.domain.Resource;
 import com.tstudioz.essentialuilibrary.viewmodel.LiveDataEvent;
 import com.tstudioz.essentialuilibrary.viewmodel.LiveDataEventWithTaggedObservers;
 

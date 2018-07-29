@@ -1,4 +1,7 @@
-package com.tstudioz.androidfirebaseitems.data;
+package com.tstudioz.androidfirebaseitems.domain.mapper;
+
+import com.tstudioz.androidfirebaseitems.domain.model.DataItem;
+import com.tstudioz.androidfirebaseitems.domain.model.DataItemEntity;
 
 public class DataItemMapper extends FirebaseItemMapper<DataItemEntity, DataItem> {
 

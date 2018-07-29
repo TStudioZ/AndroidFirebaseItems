@@ -7,8 +7,10 @@ import android.support.v4.app.Fragment
 import android.support.v4.view.ViewCompat
 import android.view.*
 import com.tstudioz.androidfirebaseitems.R
-import com.tstudioz.androidfirebaseitems.data.DataItem
-import com.tstudioz.androidfirebaseitems.data.Status
+import com.tstudioz.androidfirebaseitems.R.id.inputItemCount
+import com.tstudioz.androidfirebaseitems.R.id.inputItemName
+import com.tstudioz.androidfirebaseitems.domain.Status
+import com.tstudioz.androidfirebaseitems.domain.model.DataItem
 import com.tstudioz.androidfirebaseitems.viewmodel.ItemViewModel
 import com.tstudioz.androidfirebaseitems.viewmodel.ItemsViewModel
 import com.tstudioz.essentialuilibrary.ui.BaseFragment

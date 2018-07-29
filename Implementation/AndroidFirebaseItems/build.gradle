@@ -37,4 +37,6 @@ ext {
     espressoVersion = '3.0.2'
     firebaseUiVersion = '4.0.0'
     firebaseVersion = '16.0.1'
+    reactiveXVersion = '2.1.16'
+    reactiveXAndroidVersion = '2.0.2'
 }

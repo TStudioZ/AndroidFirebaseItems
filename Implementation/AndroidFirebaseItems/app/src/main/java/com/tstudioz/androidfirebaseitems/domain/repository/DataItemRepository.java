@@ -1,4 +1,4 @@
-package com.tstudioz.androidfirebaseitems.data;
+package com.tstudioz.androidfirebaseitems.domain.repository;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,6 +11,10 @@ import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.Transaction;
+import com.tstudioz.androidfirebaseitems.domain.mapper.DataItemMapper;
+import com.tstudioz.androidfirebaseitems.domain.model.FirebaseEventEntity;
+import com.tstudioz.androidfirebaseitems.domain.model.DataItem;
+import com.tstudioz.androidfirebaseitems.domain.model.DataItemEntity;
 
 import java.util.HashMap;
 import java.util.Map;

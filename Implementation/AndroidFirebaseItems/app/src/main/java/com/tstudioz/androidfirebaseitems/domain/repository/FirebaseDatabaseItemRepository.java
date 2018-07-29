@@ -1,8 +1,9 @@
-package com.tstudioz.androidfirebaseitems.data;
+package com.tstudioz.androidfirebaseitems.domain.repository;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -13,17 +14,27 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.tstudioz.androidfirebaseitems.domain.Resource;
+import com.tstudioz.androidfirebaseitems.domain.mapper.FirebaseItemMapper;
+import com.tstudioz.androidfirebaseitems.domain.model.FirebaseEventEntity;
 import com.tstudioz.essentialuilibrary.viewmodel.LiveDataEventWithTaggedObservers;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
+import io.reactivex.SingleOnSubscribe;
+import io.reactivex.functions.Cancellable;
 
 public abstract class FirebaseDatabaseItemRepository<Model, Entity> implements IFirebaseDatabaseItemRepository<Model> {
 
     protected final DatabaseReference dbReference;
     protected final FirebaseItemMapper<Entity, Model> mapper;
     private final Query itemsQuery;
-    private Map<FirebaseDatabaseRepositoryCallback<Model>, ListBaseValueEventListener<Model, Entity>> listenerMap;
 
     private MutableLiveData<LiveDataEventWithTaggedObservers<Resource<Model>>> saveModelEvent = new MutableLiveData<>();
     private MutableLiveData<LiveDataEventWithTaggedObservers<Resource<Model>>> updateModelEvent = new MutableLiveData<>();
@@ -56,43 +67,68 @@ public abstract class FirebaseDatabaseItemRepository<Model, Entity> implements I
         this.dbReference = FirebaseDatabase.getInstance().getReference();
         this.mapper = mapper;
         this.itemsQuery = createItemsQuery(dbReference.child(getModelsNode()));
-        this.listenerMap = new HashMap<>();
     }
 
     @Override
-    public void addItemListListener(FirebaseDatabaseRepositoryCallback<Model> callback) {
-        ListBaseValueEventListener<Model, Entity> listener = new ListBaseValueEventListener<>(mapper, callback);
-        listenerMap.put(callback, listener);
-        itemsQuery.addValueEventListener(listener);
-    }
-
-    @Override
-    public void removeItemListener(FirebaseDatabaseRepositoryCallback<Model> callback) {
-        if (listenerMap.containsKey(callback)) {
-            ListBaseValueEventListener<Model, Entity> listener = listenerMap.remove(callback);
-            itemsQuery.removeEventListener(listener);
-        }
-    }
-
-    @Override
-    public LiveData<Resource<Model>> loadModel(String key) {
-        MutableLiveData<Resource<Model>> res = new MutableLiveData<>();
-        res.setValue(Resource.working(null));
-
-        DatabaseReference ref = dbReference.child(getModelsNode()).child(key);
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+    public Observable<List<Model>> loadItems() {
+        return Observable.create(new ObservableOnSubscribe<List<Model>>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Model model = mapper.map(key, dataSnapshot);
-                res.setValue(Resource.success(model));
-            }
+            public void subscribe(ObservableEmitter<List<Model>> emitter) throws Exception {
+                ListBaseValueEventListener<Model, Entity> listener
+                        = new ListBaseValueEventListener<>(mapper, new FirebaseDatabaseRepositoryCallback<Model>() {
+                    @Override
+                    public void onSuccess(List<Model> result) {
+                        if (!emitter.isDisposed())
+                            emitter.onNext(result);
+                    }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                res.setValue(Resource.error(databaseError.toException(), null));
+                    @Override
+                    public void onError(Exception e) {
+                        if (!emitter.isDisposed())
+                            emitter.onError(e);
+                    }
+                });
+                itemsQuery.addValueEventListener(listener);
+                emitter.setCancellable(new Cancellable() {
+                    @Override
+                    public void cancel() throws Exception {
+                        itemsQuery.removeEventListener(listener);
+                        Log.d("Repository", "loadItems cancelled");
+                    }
+                });
             }
         });
-        return res;
+    }
+
+    @Override
+    public Single<Model> loadModel(String key) {
+        final DatabaseReference ref = dbReference.child(getModelsNode()).child(key);
+        return Single.create(new SingleOnSubscribe<Model>() {
+            @Override
+            public void subscribe(SingleEmitter<Model> emitter) throws Exception {
+                final ValueEventListener listener = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Model model = mapper.map(key, dataSnapshot);
+                        if (!emitter.isDisposed())
+                            emitter.onSuccess(model);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        if (!emitter.isDisposed())
+                            emitter.onError(databaseError.toException());
+                    }
+                };
+                ref.addListenerForSingleValueEvent(listener);
+                emitter.setCancellable(new Cancellable() {
+                    @Override
+                    public void cancel() throws Exception {
+                        Log.d("Repository", "loadModel cancelled");
+                    }
+                });
+            }
+        });
     }
 
     @Override

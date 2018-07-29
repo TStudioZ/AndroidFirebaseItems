@@ -1,4 +1,7 @@
-package com.tstudioz.androidfirebaseitems.data;
+package com.tstudioz.androidfirebaseitems.domain.mapper;
+
+import com.tstudioz.androidfirebaseitems.domain.model.FirebaseUser;
+import com.tstudioz.androidfirebaseitems.domain.model.FirebaseUserEntity;
 
 public class FirebaseUserMapper extends FirebaseItemMapper<FirebaseUserEntity, FirebaseUser> {
 

@@ -1,10 +1,11 @@
-package com.tstudioz.androidfirebaseitems.data;
+package com.tstudioz.androidfirebaseitems.domain.repository;
 
 import android.support.annotation.NonNull;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.tstudioz.androidfirebaseitems.domain.mapper.FirebaseItemMapper;
 
 import java.util.List;
 

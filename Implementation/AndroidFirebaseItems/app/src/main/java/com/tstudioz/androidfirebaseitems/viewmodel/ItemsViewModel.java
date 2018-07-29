@@ -8,9 +8,10 @@ import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.tstudioz.androidfirebaseitems.data.DataItem;
-import com.tstudioz.androidfirebaseitems.data.IFirebaseDatabaseItemRepository;
-import com.tstudioz.androidfirebaseitems.data.Resource;
+import com.tstudioz.androidfirebaseitems.domain.Resource;
+import com.tstudioz.androidfirebaseitems.domain.model.DataItem;
+import com.tstudioz.androidfirebaseitems.domain.repository.IFirebaseDatabaseItemRepository;
+import com.tstudioz.androidfirebaseitems.domain.usecase.LoadItemsUseCase;
 import com.tstudioz.essentialuilibrary.viewmodel.LiveDataEvent;
 import com.tstudioz.essentialuilibrary.viewmodel.LiveDataEventWithTaggedObservers;
 
@@ -18,43 +19,49 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
+
 public class ItemsViewModel extends ViewModel {
 
-    private IFirebaseDatabaseItemRepository<DataItem> repo;
+    private final CompositeDisposable disposables = new CompositeDisposable();
 
-    private MutableLiveData<List<DataItem>> items;
-    private IFirebaseDatabaseItemRepository.FirebaseDatabaseRepositoryCallback<DataItem> callback;
+    private final LoadItemsUseCase loadItemsUseCase;
+
+    private final IFirebaseDatabaseItemRepository<DataItem> repo;
+
+    private MutableLiveData<Resource<List<DataItem>>> itemsLiveData;
     private MediatorLiveData<LiveDataEvent<Resource<DataItem>>> decreaseCountEvent = new MediatorLiveData<>();
     private MediatorLiveData<LiveDataEvent<Resource<DataItem>>> increaseCountEvent = new MediatorLiveData<>();
 
     @Inject
-    public ItemsViewModel(final IFirebaseDatabaseItemRepository<DataItem> repo) {
+    public ItemsViewModel(IFirebaseDatabaseItemRepository<DataItem> repo,
+                          LoadItemsUseCase loadItemsUseCase) {
         this.repo = repo;
-        this.callback = new IFirebaseDatabaseItemRepository.FirebaseDatabaseRepositoryCallback<DataItem>() {
-            @Override
-            public void onSuccess(List<DataItem> result) {
-                items.setValue(result);
-            }
-
-            @Override
-            public void onError(Exception e) {
-                items.setValue(null);
-            }
-        };
+        this.loadItemsUseCase = loadItemsUseCase;
     }
 
     @MainThread
-    public LiveData<List<DataItem>> getItems() {
-        if (items == null) {
-            items = new MutableLiveData<>();
+    public LiveData<Resource<List<DataItem>>> getItems() {
+        if (itemsLiveData == null) {
+            itemsLiveData = new MutableLiveData<>();
             loadItems();
         }
-        return items;
+        return itemsLiveData;
     }
 
     @MainThread
     private void loadItems() {
-        repo.addItemListListener(callback);
+        disposables.add(loadItemsUseCase.execute()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread()).doOnSubscribe(
+                    disposable -> itemsLiveData.setValue(Resource.working(null)))
+            .subscribe(items -> {
+                itemsLiveData.setValue(Resource.success(items));
+            }, throwable -> {
+                itemsLiveData.setValue(Resource.error(new Exception(throwable), null));
+            }));
     }
 
     @MainThread
@@ -120,6 +127,7 @@ public class ItemsViewModel extends ViewModel {
     @Override
     protected void onCleared() {
         super.onCleared();
-        repo.removeItemListener(callback);
+
+        disposables.clear();
     }
 }

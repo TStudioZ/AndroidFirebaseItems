@@ -1,17 +1,22 @@
 package com.tstudioz.androidfirebaseitems.mock;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.tstudioz.androidfirebaseitems.data.DataItem;
-import com.tstudioz.androidfirebaseitems.data.IFirebaseDatabaseItemRepository;
-import com.tstudioz.androidfirebaseitems.data.Resource;
+import com.tstudioz.androidfirebaseitems.domain.Resource;
+import com.tstudioz.androidfirebaseitems.domain.model.DataItem;
+import com.tstudioz.androidfirebaseitems.domain.repository.IFirebaseDatabaseItemRepository;
 import com.tstudioz.essentialuilibrary.viewmodel.LiveDataEventWithTaggedObservers;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
+import io.reactivex.SingleOnSubscribe;
 
 public class MockFirebaseDatabaseItemRepository implements IFirebaseDatabaseItemRepository<DataItem> {
 
@@ -24,26 +29,21 @@ public class MockFirebaseDatabaseItemRepository implements IFirebaseDatabaseItem
     }
 
     @Override
-    public void addItemListListener(FirebaseDatabaseRepositoryCallback<DataItem> callback) {
-
+    public Observable<List<DataItem>> loadItems() {
+        return null;
     }
 
     @Override
-    public void removeItemListener(FirebaseDatabaseRepositoryCallback<DataItem> callback) {
-
-    }
-
-    @Override
-    public LiveData<Resource<DataItem>> loadModel(String key) {
-        MutableLiveData<Resource<DataItem>> res = new MutableLiveData<>();
-        res.setValue(Resource.working(null));
-
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            DataItem item = mockItems.get(key);
-            res.setValue(Resource.success(item));
-        }, 100);
-
-        return res;
+    public Single<DataItem> loadModel(String key) {
+        DataItem item = mockItems.get(key);
+        return Single.create(new SingleOnSubscribe<DataItem>() {
+            @Override
+            public void subscribe(SingleEmitter<DataItem> emitter) throws Exception {
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    emitter.onSuccess(item);
+                }, 100);
+            }
+        });
     }
 
     @Override

@@ -55,6 +55,9 @@ dependencies {
     kapt "com.google.dagger:dagger-android-processor:$rootProject.daggerVersion"
     implementation project(':EssentialUILib')
 
+    implementation "io.reactivex.rxjava2:rxjava:$rootProject.reactiveXVersion"
+    implementation "io.reactivex.rxjava2:rxandroid:$rootProject.reactiveXAndroidVersion"
+
     implementation('com.julianraj:validatedtextinputlayout:0.3.0')
 }
 

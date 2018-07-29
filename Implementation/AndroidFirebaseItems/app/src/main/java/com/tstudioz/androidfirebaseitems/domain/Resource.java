@@ -1,4 +1,4 @@
-package com.tstudioz.androidfirebaseitems.data;
+package com.tstudioz.androidfirebaseitems.domain;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;

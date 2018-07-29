@@ -1,4 +1,4 @@
-package com.tstudioz.androidfirebaseitems.data;
+package com.tstudioz.androidfirebaseitems.domain;
 
 public class Status {
 

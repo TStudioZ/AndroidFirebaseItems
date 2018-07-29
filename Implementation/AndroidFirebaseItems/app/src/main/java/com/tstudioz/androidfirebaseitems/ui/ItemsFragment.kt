@@ -18,9 +18,10 @@ import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.tstudioz.androidfirebaseitems.R
-import com.tstudioz.androidfirebaseitems.data.DataItem
-import com.tstudioz.androidfirebaseitems.data.FirebaseDatabaseUserRepository
-import com.tstudioz.androidfirebaseitems.data.Status
+import com.tstudioz.androidfirebaseitems.R.id.tvConnectionStatus
+import com.tstudioz.androidfirebaseitems.domain.model.DataItem
+import com.tstudioz.androidfirebaseitems.domain.repository.FirebaseDatabaseUserRepository
+import com.tstudioz.androidfirebaseitems.domain.Status
 import com.tstudioz.androidfirebaseitems.viewmodel.ItemsViewModel
 import com.tstudioz.androidfirebaseitems.viewmodel.UserViewModel
 import com.tstudioz.essentialuilibrary.ui.BaseFragment
@@ -28,8 +29,8 @@ import com.tstudioz.essentialuilibrary.ui.RecyclerViewItemsAdapter
 import com.tstudioz.essentialuilibrary.util.ActivityUtils
 import com.tstudioz.essentialuilibrary.util.FragmentUtils
 import com.tstudioz.essentialuilibrary.util.SnackbarUtils
-import kotlinx.android.synthetic.main.fragment_items.*
 import java.util.*
+import kotlinx.android.synthetic.main.fragment_items.*
 
 private const val RC_SIGN_IN = 123
 
@@ -44,7 +45,7 @@ class ItemsFragment : BaseFragment() {
     private lateinit var viewModelUser: UserViewModel
     private lateinit var viewModelItems: ItemsViewModel
 
-    private var user: com.tstudioz.androidfirebaseitems.data.FirebaseUser? = null
+    private var user: com.tstudioz.androidfirebaseitems.domain.model.FirebaseUser? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -179,8 +180,13 @@ class ItemsFragment : BaseFragment() {
     private fun observeData() {
         viewModelItems.items.removeObservers(this)
         viewModelItems.items.observe(this, Observer {
-            if (it != null) {
-                adapter.setItems(it)
+            when (it?.status?.status) {
+                Status.SUCCESS -> {
+                    adapter.setItems(it.data!!)
+                }
+                Status.ERROR -> {
+                    SnackbarUtils.showSnackbar(view, getString(R.string.error_loading_items))
+                }
             }
         })
         viewModelItems.saveItemEvent.removeObservers(this)

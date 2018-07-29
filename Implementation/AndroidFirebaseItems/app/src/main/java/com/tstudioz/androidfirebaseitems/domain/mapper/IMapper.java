@@ -1,4 +1,4 @@
-package com.tstudioz.androidfirebaseitems.data;
+package com.tstudioz.androidfirebaseitems.domain.mapper;
 
 public interface IMapper<Source, Destination> {
     Source mapToSource(Destination destination);

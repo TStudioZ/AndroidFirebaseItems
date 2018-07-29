@@ -1,4 +1,4 @@
-package com.tstudioz.androidfirebaseitems.data;
+package com.tstudioz.androidfirebaseitems.domain.repository;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
@@ -10,6 +10,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.tstudioz.androidfirebaseitems.domain.mapper.FirebaseItemMapper;
+import com.tstudioz.androidfirebaseitems.domain.mapper.FirebaseUserMapper;
+import com.tstudioz.androidfirebaseitems.domain.Resource;
+import com.tstudioz.androidfirebaseitems.domain.model.FirebaseUser;
+import com.tstudioz.androidfirebaseitems.domain.model.FirebaseUserEntity;
 import com.tstudioz.essentialuilibrary.viewmodel.LiveDataEventWithTaggedObservers;
 
 public class FirebaseDatabaseUserRepository implements IFirebaseDatabaseUserRepository {

@@ -17,8 +17,8 @@
     <string name="item_updated">Předmět aktualizován</string>
     <string name="item_removed">Předmět odebrán</string>
     <string name="item_consumed">Předmět zkonzumován</string>
-    <string name="count_decreasing">Snižování počtu...</string>
-    <string name="count_increasing">Zvyšování počtu...</string>
+    <string name="count_decreasing">Snižování počtu…</string>
+    <string name="count_increasing">Zvyšování počtu…</string>
     <string name="count_decreased">Počet snížen</string>
     <string name="count_increased">Počet zvýšen</string>
     <string name="error_loading_item">Předmět se nepodařilo načíst</string>
@@ -31,4 +31,5 @@
     <string name="status_online">Jsi online</string>
     <string name="status_offline">Jsi offline</string>
     <string name="error_connecting">Problém s připojením</string>
+    <string name="error_loading_items">Předměty se nepodařilo načíst</string>
 </resources>
