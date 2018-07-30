@@ -28,6 +28,10 @@ task clean(type: Delete) {
 }
 
 ext {
+    compileSdkVersion = 27
+    minSdkVersion = 21
+    targetSdkVersion = 27
+
     supportLibraryVersion = '27.1.1'
     archComponentsVersion = '1.1.1'
     constraintLayoutVersion = '1.1.2'
@@ -35,8 +39,50 @@ ext {
     jUnitVersion = '4.12'
     testRunnerVersion = '1.0.2'
     espressoVersion = '3.0.2'
+    mockitoVersion = '2.19.1'
     firebaseUiVersion = '4.0.0'
     firebaseVersion = '16.0.1'
     reactiveXVersion = '2.1.16'
     reactiveXAndroidVersion = '2.0.2'
+
+    libs = [
+            supportLibrary: [
+                    "com.android.support:design:$supportLibraryVersion",
+                    "com.android.support:appcompat-v7:$supportLibraryVersion",
+                    "com.android.support.constraint:constraint-layout:$constraintLayoutVersion",
+                    "com.android.support:support-v4:$supportLibraryVersion",
+                    "com.android.support:recyclerview-v7:$supportLibraryVersion"
+            ],
+            firebase: [
+                    "com.google.firebase:firebase-core:$firebaseVersion",
+                    "com.firebaseui:firebase-ui-auth:$firebaseUiVersion",
+                    "com.google.firebase:firebase-database:$firebaseVersion"
+            ],
+            archComponents: [
+                    "android.arch.lifecycle:livedata:$archComponentsVersion",
+                    "android.arch.lifecycle:extensions:$archComponentsVersion"
+            ],
+            dagger: [
+                    "com.google.dagger:dagger-android:$daggerVersion",
+                    "com.google.dagger:dagger-android-support:$daggerVersion"
+            ],
+            kaptDagger: [
+                    "com.google.dagger:dagger-compiler:$daggerVersion",
+                    "com.google.dagger:dagger-android-processor:$daggerVersion"
+            ],
+            reactiveX: [
+                    "io.reactivex.rxjava2:rxjava:$reactiveXVersion",
+                    "io.reactivex.rxjava2:rxandroid:$reactiveXAndroidVersion"
+            ],
+            test: [
+                    "junit:junit:$jUnitVersion",
+                    "org.mockito:mockito-core:$mockitoVersion"
+            ],
+            androidTest: [
+                    "com.android.support.test:runner:$testRunnerVersion",
+                    "com.android.support.test.espresso:espresso-core:$espressoVersion",
+                    "android.arch.core:core-testing:$archComponentsVersion",
+                    "org.mockito:mockito-android:$mockitoVersion"
+            ]
+    ]
 }

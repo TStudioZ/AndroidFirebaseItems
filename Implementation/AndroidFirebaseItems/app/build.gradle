@@ -7,11 +7,11 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion rootProject.compileSdkVersion
     defaultConfig {
         applicationId "com.tstudioz.androidfirebaseitems"
-        minSdkVersion 21
-        targetSdkVersion 27
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -32,33 +32,18 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-    implementation "com.android.support:design:$rootProject.supportLibraryVersion"
-    implementation "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
-    implementation "com.android.support.constraint:constraint-layout:$rootProject.constraintLayoutVersion"
-    implementation "com.android.support:support-v4:$rootProject.supportLibraryVersion"
-    implementation "com.google.firebase:firebase-core:$rootProject.firebaseVersion"
-    implementation "com.firebaseui:firebase-ui-auth:$rootProject.firebaseUiVersion"
-    implementation "com.google.firebase:firebase-database:$rootProject.firebaseVersion"
-    testImplementation "junit:junit:$jUnitVersion"
-    androidTestImplementation "com.android.support.test:runner:$rootProject.testRunnerVersion"
-    androidTestImplementation "com.android.support.test.espresso:espresso-core:$rootProject.espressoVersion"
-    implementation "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
-    androidTestImplementation "android.arch.core:core-testing:$archComponentsVersion"
-    implementation "android.arch.lifecycle:livedata:$archComponentsVersion"
-    implementation "android.arch.lifecycle:extensions:$archComponentsVersion"
-    testImplementation 'org.mockito:mockito-core:2.19.1'
-    androidTestImplementation 'org.mockito:mockito-android:2.19.1'
-    // Dagger
-    implementation "com.google.dagger:dagger-android:$rootProject.daggerVersion"
-    implementation "com.google.dagger:dagger-android-support:$rootProject.daggerVersion"
-    kapt "com.google.dagger:dagger-compiler:$rootProject.daggerVersion"
-    kapt "com.google.dagger:dagger-android-processor:$rootProject.daggerVersion"
-    implementation project(':EssentialUILib')
-
-    implementation "io.reactivex.rxjava2:rxjava:$rootProject.reactiveXVersion"
-    implementation "io.reactivex.rxjava2:rxandroid:$rootProject.reactiveXAndroidVersion"
+    implementation libs.supportLibrary
+    implementation libs.firebase
+    implementation libs.archComponents
+    implementation libs.reactiveX
+    implementation libs.dagger
+    kapt libs.kaptDagger
+    androidTestImplementation libs.androidTest
+    testImplementation libs.test
 
     implementation('com.julianraj:validatedtextinputlayout:0.3.0')
+
+    implementation project(':EssentialUILib')
 }
 
 apply plugin: 'com.google.gms.google-services'
