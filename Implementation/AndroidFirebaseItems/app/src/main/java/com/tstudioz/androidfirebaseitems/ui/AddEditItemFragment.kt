@@ -7,8 +7,6 @@ import android.support.v4.app.Fragment
 import android.support.v4.view.ViewCompat
 import android.view.*
 import com.tstudioz.androidfirebaseitems.R
-import com.tstudioz.androidfirebaseitems.R.id.inputItemCount
-import com.tstudioz.androidfirebaseitems.R.id.inputItemName
 import com.tstudioz.androidfirebaseitems.domain.Status
 import com.tstudioz.androidfirebaseitems.domain.model.DataItem
 import com.tstudioz.androidfirebaseitems.viewmodel.ItemViewModel
@@ -80,17 +78,7 @@ class AddEditItemFragment : BaseFragment() {
             })
         }
         viewModelItems.saveItemEvent.observe(this, Observer {
-            when (it?.getContentIfNotHandled(TAG)?.status?.status) {
-                Status.SUCCESS -> {
-                    activity?.finish()
-                }
-                Status.ERROR -> {
-                    SnackbarUtils.showSnackbar(view, getString(R.string.error_saving_item))
-                }
-            }
-        })
-        viewModelItems.updateItemEvent.observe(this, Observer {
-            when (it?.getContentIfNotHandled(TAG)?.status?.status) {
+            when (it?.contentIfNotHandled?.status?.status) {
                 Status.SUCCESS -> {
                     activity?.finish()
                 }
@@ -100,7 +88,7 @@ class AddEditItemFragment : BaseFragment() {
             }
         })
         viewModelItems.deleteItemEvent.observe(this, Observer {
-            when (it?.getContentIfNotHandled(TAG)?.status?.status) {
+            when (it?.contentIfNotHandled?.status?.status) {
                 Status.SUCCESS -> {
                     activity?.finish()
                 }

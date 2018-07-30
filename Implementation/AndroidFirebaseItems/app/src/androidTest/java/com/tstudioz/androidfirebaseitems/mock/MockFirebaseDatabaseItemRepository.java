@@ -1,13 +1,11 @@
 package com.tstudioz.androidfirebaseitems.mock;
 
-import android.arch.lifecycle.LiveData;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.tstudioz.androidfirebaseitems.domain.Resource;
 import com.tstudioz.androidfirebaseitems.domain.model.DataItem;
 import com.tstudioz.androidfirebaseitems.domain.repository.IFirebaseDatabaseItemRepository;
-import com.tstudioz.essentialuilibrary.viewmodel.LiveDataEventWithTaggedObservers;
+import com.tstudioz.androidfirebaseitems.domain.response.UpdateCountResponse;
 
 import java.util.HashMap;
 import java.util.List;
@@ -47,42 +45,42 @@ public class MockFirebaseDatabaseItemRepository implements IFirebaseDatabaseItem
     }
 
     @Override
-    public void save(DataItem modelOld, DataItem modelNew) {
-
-    }
-
-    @Override
-    public void delete(DataItem item) {
-
-    }
-
-    @Override
-    public LiveData<LiveDataEventWithTaggedObservers<Resource<DataItem>>> getSaveModelEvent() {
+    public Single<DataItem> save(DataItem modelOld, DataItem modelNew) {
         return null;
     }
 
     @Override
-    public LiveData<LiveDataEventWithTaggedObservers<Resource<DataItem>>> getUpdateModelEvent() {
+    public Single<DataItem> delete(DataItem dataItem) {
         return null;
     }
 
     @Override
-    public LiveData<LiveDataEventWithTaggedObservers<Resource<DataItem>>> getDeleteModelEvent() {
+    public Observable<DataItem> getSaveModelEvent() {
         return null;
     }
 
     @Override
-    public LiveData<Resource<DataItem>> decreaseCount(DataItem item) {
+    public Observable<DataItem> getUpdateModelEvent() {
         return null;
     }
 
     @Override
-    public LiveData<Resource<DataItem>> increaseCount(DataItem item) {
+    public Observable<DataItem> getDeleteModelEvent() {
         return null;
     }
 
     @Override
-    public LiveData<Resource<Boolean>> isConnected() {
+    public Single<UpdateCountResponse<DataItem>> decreaseCount(DataItem dataItem) {
+        return null;
+    }
+
+    @Override
+    public Single<UpdateCountResponse<DataItem>> increaseCount(DataItem dataItem) {
+        return null;
+    }
+
+    @Override
+    public Observable<Boolean> isConnected() {
         return null;
     }
 }

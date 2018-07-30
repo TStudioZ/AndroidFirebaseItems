@@ -7,16 +7,14 @@ import javax.inject.Inject;
 
 import io.reactivex.Single;
 
-public class LoadItemUseCase {
-
-    private final IFirebaseDatabaseItemRepository<DataItem> repo;
+public class LoadItemUseCase extends RepoUseCase<DataItem> {
 
     @Inject
     public LoadItemUseCase(IFirebaseDatabaseItemRepository<DataItem> repo) {
-        this.repo = repo;
+        super(repo);
     }
 
     public Single<DataItem> execute(String key) {
-        return repo.loadModel(key);
+        return getRepo().loadModel(key);
     }
 }

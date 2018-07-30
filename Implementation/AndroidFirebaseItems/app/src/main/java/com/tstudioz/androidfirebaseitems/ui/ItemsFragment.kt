@@ -18,10 +18,9 @@ import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.tstudioz.androidfirebaseitems.R
-import com.tstudioz.androidfirebaseitems.R.id.tvConnectionStatus
+import com.tstudioz.androidfirebaseitems.domain.Status
 import com.tstudioz.androidfirebaseitems.domain.model.DataItem
 import com.tstudioz.androidfirebaseitems.domain.repository.FirebaseDatabaseUserRepository
-import com.tstudioz.androidfirebaseitems.domain.Status
 import com.tstudioz.androidfirebaseitems.viewmodel.ItemsViewModel
 import com.tstudioz.androidfirebaseitems.viewmodel.UserViewModel
 import com.tstudioz.essentialuilibrary.ui.BaseFragment
@@ -29,8 +28,8 @@ import com.tstudioz.essentialuilibrary.ui.RecyclerViewItemsAdapter
 import com.tstudioz.essentialuilibrary.util.ActivityUtils
 import com.tstudioz.essentialuilibrary.util.FragmentUtils
 import com.tstudioz.essentialuilibrary.util.SnackbarUtils
-import java.util.*
 import kotlinx.android.synthetic.main.fragment_items.*
+import java.util.*
 
 private const val RC_SIGN_IN = 123
 
@@ -189,25 +188,25 @@ class ItemsFragment : BaseFragment() {
                 }
             }
         })
-        viewModelItems.saveItemEvent.removeObservers(this)
-        viewModelItems.saveItemEvent.observe(this, Observer {
-            when (it?.getContentIfNotHandled(TAG)?.status?.status) {
+        viewModelItems.lastSaveItemEvent.removeObservers(this)
+        viewModelItems.lastSaveItemEvent.observe(this, Observer {
+            when (it?.contentIfNotHandled?.status?.status) {
                 Status.SUCCESS -> {
                     SnackbarUtils.showSnackbar(view, getString(R.string.item_added))
                 }
             }
         })
-        viewModelItems.updateItemEvent.removeObservers(this)
-        viewModelItems.updateItemEvent.observe(this, Observer {
-            when (it?.getContentIfNotHandled(TAG)?.status?.status) {
+        viewModelItems.lastUpdateItemEvent.removeObservers(this)
+        viewModelItems.lastUpdateItemEvent.observe(this, Observer {
+            when (it?.contentIfNotHandled?.status?.status) {
                 Status.SUCCESS -> {
                     SnackbarUtils.showSnackbar(view, getString(R.string.item_updated))
                 }
             }
         })
-        viewModelItems.deleteItemEvent.removeObservers(this)
-        viewModelItems.deleteItemEvent.observe(this, Observer {
-            when (it?.getContentIfNotHandled(TAG)?.status?.status) {
+        viewModelItems.lastDeleteItemEvent.removeObservers(this)
+        viewModelItems.lastDeleteItemEvent.observe(this, Observer {
+            when (it?.contentIfNotHandled?.status?.status) {
                 Status.SUCCESS -> {
                     SnackbarUtils.showSnackbar(view, getString(R.string.item_removed))
                 }
@@ -217,7 +216,7 @@ class ItemsFragment : BaseFragment() {
         viewModelItems.decreaseCountEvent.observe(this, Observer {
             when (it?.peekContentIfNotHandled()?.status?.status) {
                 Status.SUCCESS -> {
-                    if (it.peekContent()?.data != null) {
+                    if (!it.peekContent()?.data?.consumed!!) {
                         SnackbarUtils.showSnackbar(view, getString(R.string.count_decreased))
                     } else {
                         SnackbarUtils.showSnackbar(view, getString(R.string.item_consumed))

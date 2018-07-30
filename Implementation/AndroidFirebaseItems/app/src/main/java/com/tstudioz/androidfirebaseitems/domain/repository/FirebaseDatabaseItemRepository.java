@@ -1,11 +1,8 @@
 package com.tstudioz.androidfirebaseitems.domain.repository;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -14,10 +11,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.tstudioz.androidfirebaseitems.domain.Resource;
 import com.tstudioz.androidfirebaseitems.domain.mapper.FirebaseItemMapper;
 import com.tstudioz.androidfirebaseitems.domain.model.FirebaseEventEntity;
-import com.tstudioz.essentialuilibrary.viewmodel.LiveDataEventWithTaggedObservers;
+import com.tstudioz.androidfirebaseitems.domain.response.UpdateCountResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -29,6 +25,8 @@ import io.reactivex.Single;
 import io.reactivex.SingleEmitter;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.functions.Cancellable;
+import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.subjects.Subject;
 
 public abstract class FirebaseDatabaseItemRepository<Model, Entity> implements IFirebaseDatabaseItemRepository<Model> {
 
@@ -36,22 +34,46 @@ public abstract class FirebaseDatabaseItemRepository<Model, Entity> implements I
     protected final FirebaseItemMapper<Entity, Model> mapper;
     private final Query itemsQuery;
 
-    private MutableLiveData<LiveDataEventWithTaggedObservers<Resource<Model>>> saveModelEvent = new MutableLiveData<>();
-    private MutableLiveData<LiveDataEventWithTaggedObservers<Resource<Model>>> updateModelEvent = new MutableLiveData<>();
-    private MutableLiveData<LiveDataEventWithTaggedObservers<Resource<Model>>> deleteModelEvent = new MutableLiveData<>();
+    private Subject<Model> saveModelEvent = BehaviorSubject.create();
+    private Subject<Model> updateModelEvent = BehaviorSubject.create();
+    private Subject<Model> deleteModelEvent = BehaviorSubject.create();
+
+    private void saveModelEventOnNext(Model model) {
+        saveModelEvent.onNext(model);
+    }
+
+    private void saveModelEventOnError(Throwable t) {
+        saveModelEvent.onError(t);
+    }
+
+    private void updateModelEventOnNext(Model model) {
+        updateModelEvent.onNext(model);
+    }
+
+    private void updateModelEventOnError(Throwable t) {
+        updateModelEvent.onError(t);
+    }
+
+    private void deleteModelEventOnNext(Model model) {
+        deleteModelEvent.onNext(model);
+    }
+
+    private void deleteModelEventOnError(Throwable t) {
+        deleteModelEvent.onError(t);
+    }
 
     @Override
-    public LiveData<LiveDataEventWithTaggedObservers<Resource<Model>>> getSaveModelEvent() {
+    public Observable<Model> getSaveModelEvent() {
         return saveModelEvent;
     }
 
     @Override
-    public MutableLiveData<LiveDataEventWithTaggedObservers<Resource<Model>>> getUpdateModelEvent() {
+    public Observable<Model> getUpdateModelEvent() {
         return updateModelEvent;
     }
 
     @Override
-    public LiveData<LiveDataEventWithTaggedObservers<Resource<Model>>> getDeleteModelEvent() {
+    public Observable<Model> getDeleteModelEvent() {
         return deleteModelEvent;
     }
 
@@ -102,10 +124,10 @@ public abstract class FirebaseDatabaseItemRepository<Model, Entity> implements I
 
     @Override
     public Single<Model> loadModel(String key) {
-        final DatabaseReference ref = dbReference.child(getModelsNode()).child(key);
         return Single.create(new SingleOnSubscribe<Model>() {
             @Override
             public void subscribe(SingleEmitter<Model> emitter) throws Exception {
+                final DatabaseReference ref = dbReference.child(getModelsNode()).child(key);
                 final ValueEventListener listener = new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -132,101 +154,126 @@ public abstract class FirebaseDatabaseItemRepository<Model, Entity> implements I
     }
 
     @Override
-    public void save(Model modelOld, Model modelNew) {
-        Entity entity = mapper.mapToSource(modelNew);
-        DatabaseReference ref;
-        String key = getModelKey(modelNew);
-        if (key == null) {
-            ref = dbReference.child(getModelsNode()).push();
-            ref.setValue(entity).addOnSuccessListener(aVoid -> {
-                saveSaveItemEvent(ref.getKey(), modelNew);
-                setModelKey(modelNew, ref.getKey());
-                saveModelEvent.setValue(new LiveDataEventWithTaggedObservers<>(Resource.success(modelNew)));
-            }).addOnFailureListener(e -> {
-                saveModelEvent.setValue(new LiveDataEventWithTaggedObservers<>(Resource.error(e, modelNew)));
-            });
-        } else {
-            ref = dbReference.child(getModelsNode()).child(key);
-            ref.setValue(entity).addOnSuccessListener(aVoid -> {
-                saveEditItemEvent(ref.getKey(), modelOld, modelNew);
-                setModelKey(modelNew, ref.getKey());
-                updateModelEvent.setValue(new LiveDataEventWithTaggedObservers<>(Resource.success(modelOld)));
-            }).addOnFailureListener(e -> {
-                updateModelEvent.setValue(new LiveDataEventWithTaggedObservers<>(Resource.error(e, modelOld)));
-            });
-        }
-    }
+    public Single<Model> save(Model modelOld, Model modelNew) {
+        return Single.create(new SingleOnSubscribe<Model>() {
+            @Override
+            public void subscribe(SingleEmitter<Model> emitter) throws Exception {
+                final Entity entity = mapper.mapToSource(modelNew);
+                final String key = getModelKey(modelNew);
+                DatabaseReference ref;
+                if (key == null) {
+                    ref = dbReference.child(getModelsNode()).push();
+                    ref.setValue(entity).addOnSuccessListener(aVoid -> {
+                        saveSaveItemEvent(ref.getKey(), modelNew);
+                        setModelKey(modelNew, ref.getKey());
 
-    @Override
-    public void delete(Model model) {
-        String key = getModelKey(model);
-        if (key == null) return;
+                        Log.d("Repository", "save onNext()");
+                        saveModelEventOnNext(modelNew);
+                        if (!emitter.isDisposed())
+                            emitter.onSuccess(modelNew);
+                    }).addOnFailureListener(e -> {
+                        //new LiveDataEventWithTaggedObservers<>(Resource.error(e, modelNew))
+                        saveModelEventOnError(e);
+                    });
+                } else {
+                    ref = dbReference.child(getModelsNode()).child(key);
+                    ref.setValue(entity).addOnSuccessListener(aVoid -> {
+                        saveEditItemEvent(ref.getKey(), modelOld, modelNew);
+                        setModelKey(modelNew, ref.getKey());
 
-        DatabaseReference ref = dbReference.child(getModelsNode()).child(key);
-        ref.removeValue().addOnSuccessListener(aVoid -> {
-            saveDeleteItemEvent(ref.getKey(), model);
-            setModelKey(model, ref.getKey());
-            deleteModelEvent.setValue(new LiveDataEventWithTaggedObservers<>(Resource.success(model)));
-        }).addOnFailureListener(e -> {
-            deleteModelEvent.setValue(new LiveDataEventWithTaggedObservers<>(Resource.error(e, model)));
+                        Log.d("Repository", "update onNext()");
+                        updateModelEventOnNext(modelOld);
+                        if (!emitter.isDisposed())
+                            emitter.onSuccess(modelOld);
+                    }).addOnFailureListener(FirebaseDatabaseItemRepository.this::updateModelEventOnError);
+                }
+                emitter.setCancellable(new Cancellable() {
+                    @Override
+                    public void cancel() throws Exception {
+                        Log.d("Repository", "save cancelled");
+                    }
+                });
+            }
         });
     }
 
     @Override
-    public LiveData<Resource<Model>> decreaseCount(Model model) {
+    public Single<Model> delete(Model model) {
+        return Single.create(new SingleOnSubscribe<Model>() {
+            @Override
+            public void subscribe(SingleEmitter<Model> emitter) throws Exception {
+                String key = getModelKey(model);
+                if (key == null) {
+                    if (!emitter.isDisposed())
+                        emitter.onError(new Exception("Key cannot be null"));
+                    return;
+                }
+
+                DatabaseReference ref = dbReference.child(getModelsNode()).child(key);
+                ref.removeValue().addOnSuccessListener(aVoid -> {
+                    saveDeleteItemEvent(ref.getKey(), model);
+                    setModelKey(model, ref.getKey());
+
+                    deleteModelEventOnNext(model);
+                    if (!emitter.isDisposed())
+                        emitter.onSuccess(model);
+                }).addOnFailureListener(FirebaseDatabaseItemRepository.this::deleteModelEventOnError);
+            }
+        });
+    }
+
+    @Override
+    public Single<UpdateCountResponse<Model>> decreaseCount(Model model) {
         return updateCount(model, false);
     }
 
     @Override
-    public LiveData<Resource<Model>> increaseCount(Model model) {
+    public Single<UpdateCountResponse<Model>> increaseCount(Model model) {
         return updateCount(model, true);
     }
 
-    private LiveData<Resource<Model>> updateCount(Model model, boolean increase) {
-        MutableLiveData<Resource<Model>> res = new MutableLiveData<>();
-        res.setValue(Resource.working(null));
-
-        Model cloned = cloneModel(model);
-        String key = getModelKey(model);
-
-        DataItemCallback<Model> callback = new DataItemCallback<Model>() {
+    private Single<UpdateCountResponse<Model>> updateCount(Model model, boolean increase) {
+        return Single.create(new SingleOnSubscribe<UpdateCountResponse<Model>>() {
             @Override
-            public void onSuccess(Model result) {
-                res.setValue(Resource.success(result));
-            }
+            public void subscribe(SingleEmitter<UpdateCountResponse<Model>> emitter) throws Exception {
+                Model cloned = cloneModel(model);
+                String key = getModelKey(model);
 
-            @Override
-            public void onError(Exception e) {
-                res.setValue(Resource.error(e, null));
-            }
-        };
-        DatabaseReference ref = dbReference.child(getModelsNode()).child(key);
-        if (increase) {
-            saveIncreaseCountEvent(ref.getKey(), model);
-        } else {
-            saveDecreaseCountEvent(ref.getKey(), model);
-        }
-        updateCountImpl(increase, ref, model, callback);
-        return res;
-    }
+                DataItemCallback<Model> callback = new DataItemCallback<Model>() {
+                    @Override
+                    public void onSuccess(Model result) {
+                        if (!emitter.isDisposed())
+                            emitter.onSuccess(new UpdateCountResponse<>(model, result == null));
+                    }
 
-    private <T> void listenForResult(DatabaseReference ref,
-                                     Model model,
-                                     Task<T> task,
-                                     MutableLiveData<LiveDataEventWithTaggedObservers<Resource<Model>>> event) {
-        task.addOnSuccessListener(aVoid -> {
-            setModelKey(model, ref.getKey());
-            event.setValue(new LiveDataEventWithTaggedObservers<>(Resource.success(model)));
-        }).addOnFailureListener(e -> {
-            event.setValue(new LiveDataEventWithTaggedObservers<>(Resource.error(e, model)));
+                    @Override
+                    public void onError(Exception e) {
+                        if (!emitter.isDisposed())
+                            emitter.onError(e);
+                    }
+                };
+                DatabaseReference ref = dbReference.child(getModelsNode()).child(key);
+                if (increase) {
+                    saveIncreaseCountEvent(ref.getKey(), model);
+                } else {
+                    saveDecreaseCountEvent(ref.getKey(), model);
+                }
+                updateCountImpl(increase, ref, model, callback);
+                emitter.setCancellable(new Cancellable() {
+                    @Override
+                    public void cancel() throws Exception {
+                        Log.d("Repository", "updateCount cancelled");
+                    }
+                });
+            }
         });
     }
 
-    protected String EVENT_SAVE_ITEM = "eventSaveItem";
-    protected String EVENT_EDIT_ITEM = "eventEditItem";
-    protected String EVENT_DELETE_ITEM = "eventDeleteItem";
-    protected String EVENT_DECREASE_COUNT = "eventDecreaseCount";
-    protected String EVENT_INCREASE_COUNT = "eventIncreaseCount";
+    protected static final String EVENT_SAVE_ITEM = "eventSaveItem";
+    protected static final String EVENT_EDIT_ITEM = "eventEditItem";
+    protected static final String EVENT_DELETE_ITEM = "eventDeleteItem";
+    protected static final String EVENT_DECREASE_COUNT = "eventDecreaseCount";
+    protected static final String EVENT_INCREASE_COUNT = "eventIncreaseCount";
 
     protected String getUserUID() {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -246,25 +293,35 @@ public abstract class FirebaseDatabaseItemRepository<Model, Entity> implements I
         ref.setValue(event);
     }
 
-    private MutableLiveData<Resource<Boolean>> connectedLiveData;
     @Override
-    public LiveData<Resource<Boolean>> isConnected() {
-        if (connectedLiveData == null) {
-            connectedLiveData = new MutableLiveData<>();
-            DatabaseReference ref = FirebaseDatabase.getInstance().getReference(".info/connected");
-            ref.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    Boolean connected = dataSnapshot.getValue(Boolean.class);
-                    connectedLiveData.setValue(Resource.success(connected));
-                }
+    public Observable<Boolean> isConnected() {
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(ObservableEmitter<Boolean> emitter) throws Exception {
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReference(".info/connected");
+                ValueEventListener listener = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Boolean connected = dataSnapshot.getValue(Boolean.class);
+                        if (!emitter.isDisposed())
+                            emitter.onNext(connected);
+                    }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    connectedLiveData.setValue(Resource.error(databaseError.toException(), null));
-                }
-            });
-        }
-        return connectedLiveData;
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        if (!emitter.isDisposed())
+                            emitter.onError(databaseError.toException());
+                    }
+                };
+                ref.addValueEventListener(listener);
+                emitter.setCancellable(new Cancellable() {
+                    @Override
+                    public void cancel() throws Exception {
+                        ref.removeEventListener(listener);
+                        Log.d("Repository", "isConnected cancelled");
+                    }
+                });
+            }
+        });
     }
 }

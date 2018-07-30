@@ -12,7 +12,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-abstract class RepositoryModule {
+public class RepositoryModule {
 
     @Provides
     @Singleton
