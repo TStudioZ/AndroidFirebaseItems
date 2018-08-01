@@ -7,18 +7,18 @@ import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.tstudioz.androidfirebaseitems.domain.Resource;
+import com.tstudioz.androidfirebaseitems.data.Resource;
 import com.tstudioz.androidfirebaseitems.domain.model.DataItem;
 import com.tstudioz.androidfirebaseitems.domain.response.UpdateCountResponse;
-import com.tstudioz.androidfirebaseitems.domain.usecase.DecreaseCountUseCase;
-import com.tstudioz.androidfirebaseitems.domain.usecase.DeleteItemUseCase;
-import com.tstudioz.androidfirebaseitems.domain.usecase.GetLastDeleteItemEventUseCase;
-import com.tstudioz.androidfirebaseitems.domain.usecase.GetLastSaveItemEventUseCase;
-import com.tstudioz.androidfirebaseitems.domain.usecase.GetLastUpdateItemEventUseCase;
-import com.tstudioz.androidfirebaseitems.domain.usecase.IncreaseCountUseCase;
-import com.tstudioz.androidfirebaseitems.domain.usecase.IsConnectedUseCase;
-import com.tstudioz.androidfirebaseitems.domain.usecase.LoadItemsUseCase;
-import com.tstudioz.androidfirebaseitems.domain.usecase.SaveItemUseCase;
+import com.tstudioz.androidfirebaseitems.data.usecase.DecreaseCountUseCase;
+import com.tstudioz.androidfirebaseitems.data.usecase.DeleteItemUseCase;
+import com.tstudioz.androidfirebaseitems.data.usecase.GetLastDeleteItemEventUseCase;
+import com.tstudioz.androidfirebaseitems.data.usecase.GetLastSaveItemEventUseCase;
+import com.tstudioz.androidfirebaseitems.data.usecase.GetLastUpdateItemEventUseCase;
+import com.tstudioz.androidfirebaseitems.data.usecase.IncreaseCountUseCase;
+import com.tstudioz.androidfirebaseitems.data.usecase.IsConnectedUseCase;
+import com.tstudioz.androidfirebaseitems.data.usecase.LoadItemsUseCase;
+import com.tstudioz.androidfirebaseitems.data.usecase.SaveItemUseCase;
 import com.tstudioz.essentialuilibrary.viewmodel.LiveDataEvent;
 
 import java.util.List;

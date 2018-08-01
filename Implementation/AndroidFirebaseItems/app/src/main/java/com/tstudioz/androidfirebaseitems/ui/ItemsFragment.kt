@@ -18,9 +18,9 @@ import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.tstudioz.androidfirebaseitems.R
-import com.tstudioz.androidfirebaseitems.domain.Status
+import com.tstudioz.androidfirebaseitems.data.Status
 import com.tstudioz.androidfirebaseitems.domain.model.DataItem
-import com.tstudioz.androidfirebaseitems.domain.repository.FirebaseDatabaseUserRepository
+import com.tstudioz.androidfirebaseitems.data.repository.FirebaseDatabaseUserRepository
 import com.tstudioz.androidfirebaseitems.viewmodel.ItemsViewModel
 import com.tstudioz.androidfirebaseitems.viewmodel.UserViewModel
 import com.tstudioz.essentialuilibrary.ui.BaseFragment

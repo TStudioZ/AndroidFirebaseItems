@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = '1.2.50'
+    ext.kotlin_version = '1.2.51'
     repositories {
         google()
         jcenter()
@@ -71,7 +71,9 @@ ext {
                     "com.google.dagger:dagger-android-processor:$daggerVersion"
             ],
             reactiveX: [
-                    "io.reactivex.rxjava2:rxjava:$reactiveXVersion",
+                    "io.reactivex.rxjava2:rxjava:$reactiveXVersion"
+            ],
+            reactiveXAndroid: [
                     "io.reactivex.rxjava2:rxandroid:$reactiveXAndroidVersion"
             ],
             test: [

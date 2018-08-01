@@ -4,11 +4,11 @@ import android.arch.core.executor.testing.InstantTaskExecutorRule;
 import android.arch.lifecycle.Observer;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.tstudioz.androidfirebaseitems.data.Resource;
+import com.tstudioz.androidfirebaseitems.data.Status;
+import com.tstudioz.androidfirebaseitems.data.usecase.LoadItemUseCase;
 import com.tstudioz.androidfirebaseitems.domain.model.DataItem;
 import com.tstudioz.androidfirebaseitems.domain.repository.IFirebaseDatabaseItemRepository;
-import com.tstudioz.androidfirebaseitems.domain.Resource;
-import com.tstudioz.androidfirebaseitems.domain.Status;
-import com.tstudioz.androidfirebaseitems.domain.usecase.LoadItemUseCase;
 import com.tstudioz.androidfirebaseitems.mock.MockFirebaseDatabaseItemRepository;
 import com.tstudioz.androidfirebaseitems.viewmodel.ItemViewModel;
 import com.tstudioz.essentialuilibrary.viewmodel.LiveDataEvent;

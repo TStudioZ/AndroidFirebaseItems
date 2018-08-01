@@ -5,9 +5,9 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.support.annotation.MainThread;
 
-import com.tstudioz.androidfirebaseitems.domain.Resource;
+import com.tstudioz.androidfirebaseitems.data.Resource;
 import com.tstudioz.androidfirebaseitems.domain.model.DataItem;
-import com.tstudioz.androidfirebaseitems.domain.usecase.LoadItemUseCase;
+import com.tstudioz.androidfirebaseitems.data.usecase.LoadItemUseCase;
 import com.tstudioz.essentialuilibrary.viewmodel.LiveDataEvent;
 
 import javax.inject.Inject;

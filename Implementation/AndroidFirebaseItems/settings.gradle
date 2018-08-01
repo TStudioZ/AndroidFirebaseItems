@@ -1,2 +1,2 @@
-include ':app', ':EssentialUILib'
+include ':app', ':EssentialUILib', ':data', ':domain'
 project(':EssentialUILib').projectDir = new File('EssentialUILibrary/EssentialUILibrary')

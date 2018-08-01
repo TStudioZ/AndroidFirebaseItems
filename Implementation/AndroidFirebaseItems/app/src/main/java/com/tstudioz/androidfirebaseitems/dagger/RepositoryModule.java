@@ -1,8 +1,8 @@
 package com.tstudioz.androidfirebaseitems.dagger;
 
+import com.tstudioz.androidfirebaseitems.data.repository.DataItemRepository;
+import com.tstudioz.androidfirebaseitems.data.repository.FirebaseDatabaseUserRepository;
 import com.tstudioz.androidfirebaseitems.domain.model.DataItem;
-import com.tstudioz.androidfirebaseitems.domain.repository.DataItemRepository;
-import com.tstudioz.androidfirebaseitems.domain.repository.FirebaseDatabaseUserRepository;
 import com.tstudioz.androidfirebaseitems.domain.repository.IFirebaseDatabaseItemRepository;
 import com.tstudioz.androidfirebaseitems.domain.repository.IFirebaseDatabaseUserRepository;
 

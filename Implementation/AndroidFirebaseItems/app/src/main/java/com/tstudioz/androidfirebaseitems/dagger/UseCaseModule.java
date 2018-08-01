@@ -1,17 +1,21 @@
 package com.tstudioz.androidfirebaseitems.dagger;
 
+import com.tstudioz.androidfirebaseitems.data.usecase.DecreaseCountUseCase;
+import com.tstudioz.androidfirebaseitems.data.usecase.DeleteItemUseCase;
+import com.tstudioz.androidfirebaseitems.data.usecase.GetLastDeleteItemEventUseCase;
+import com.tstudioz.androidfirebaseitems.data.usecase.GetLastSaveItemEventUseCase;
+import com.tstudioz.androidfirebaseitems.data.usecase.GetLastSaveUserEventUseCase;
+import com.tstudioz.androidfirebaseitems.data.usecase.GetLastUpdateItemEventUseCase;
+import com.tstudioz.androidfirebaseitems.data.usecase.IncreaseCountUseCase;
+import com.tstudioz.androidfirebaseitems.data.usecase.IsConnectedUseCase;
+import com.tstudioz.androidfirebaseitems.data.usecase.LoadItemUseCase;
+import com.tstudioz.androidfirebaseitems.data.usecase.LoadItemsUseCase;
+import com.tstudioz.androidfirebaseitems.data.usecase.RegisterLoadUserUseCase;
+import com.tstudioz.androidfirebaseitems.data.usecase.SaveItemUseCase;
+import com.tstudioz.androidfirebaseitems.data.usecase.SaveUserUseCase;
 import com.tstudioz.androidfirebaseitems.domain.model.DataItem;
 import com.tstudioz.androidfirebaseitems.domain.repository.IFirebaseDatabaseItemRepository;
-import com.tstudioz.androidfirebaseitems.domain.usecase.DecreaseCountUseCase;
-import com.tstudioz.androidfirebaseitems.domain.usecase.DeleteItemUseCase;
-import com.tstudioz.androidfirebaseitems.domain.usecase.GetLastDeleteItemEventUseCase;
-import com.tstudioz.androidfirebaseitems.domain.usecase.GetLastSaveItemEventUseCase;
-import com.tstudioz.androidfirebaseitems.domain.usecase.GetLastUpdateItemEventUseCase;
-import com.tstudioz.androidfirebaseitems.domain.usecase.IncreaseCountUseCase;
-import com.tstudioz.androidfirebaseitems.domain.usecase.IsConnectedUseCase;
-import com.tstudioz.androidfirebaseitems.domain.usecase.LoadItemUseCase;
-import com.tstudioz.androidfirebaseitems.domain.usecase.LoadItemsUseCase;
-import com.tstudioz.androidfirebaseitems.domain.usecase.SaveItemUseCase;
+import com.tstudioz.androidfirebaseitems.domain.repository.IFirebaseDatabaseUserRepository;
 
 import dagger.Module;
 import dagger.Provides;
@@ -67,5 +71,20 @@ abstract class UseCaseModule {
     @Provides
     static IsConnectedUseCase bindIsConnectedUseCase(IFirebaseDatabaseItemRepository<DataItem> repo) {
         return new IsConnectedUseCase(repo);
+    }
+
+    @Provides
+    static RegisterLoadUserUseCase bindRegisterLoadUserUseCase(IFirebaseDatabaseUserRepository repo) {
+        return new RegisterLoadUserUseCase(repo);
+    }
+
+    @Provides
+    static SaveUserUseCase bindSaveUserUseCase(IFirebaseDatabaseUserRepository repo) {
+        return new SaveUserUseCase(repo);
+    }
+
+    @Provides
+    static GetLastSaveUserEventUseCase bindGetLastSaveUserUseCase(IFirebaseDatabaseUserRepository repo) {
+        return new GetLastSaveUserEventUseCase(repo);
     }
 }
